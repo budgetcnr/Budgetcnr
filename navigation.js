@@ -21,8 +21,10 @@ document.querySelectorAll('.site-menu').forEach(menu => {
       links[next].focus();
     }
   });
-  menu.addEventListener('focusout', event => {
-    if (!menu.contains(event.relatedTarget)) close();
+  menu.addEventListener('focusout', () => {
+    setTimeout(() => {
+      if (!menu.contains(document.activeElement)) close();
+    }, 0);
   });
-  links.forEach(link => link.addEventListener('click', () => close(true)));
+  links.forEach(link => link.addEventListener('click', () => close()));
 });
