@@ -8,6 +8,6 @@
 .menu-links a:hover,.menu-links a[aria-current=page]{background:#edf5ff;color:var(--blue)}
 .site-menu summary:focus-visible,.menu-links a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
 html{scroll-padding-top:100px}
-.navin{padding-block:8px}.brand{min-width:0}.mark{flex-shrink:0}
-@media(max-width:580px){.navin{gap:10px}.brand{gap:8px}.brand strong{font-size:.875rem}.mark{width:42px;height:42px;border-radius:12px}.site-menu summary{padding:9px 12px;gap:6px}}
+.navin{padding-block:8px}.brand{min-width:0}.mark{flex-shrink:0}.brand .school-name{display:block;color:var(--muted);font-size:.78rem;line-height:1.25}
+@media(max-width:580px){.navin{gap:10px}.brand{gap:8px}.brand strong{font-size:.875rem}.brand .school-name{font-size:.7rem}.mark{width:42px;height:42px;border-radius:12px}.site-menu summary{padding:9px 12px;gap:6px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.menu-chevron{transition:none}}
