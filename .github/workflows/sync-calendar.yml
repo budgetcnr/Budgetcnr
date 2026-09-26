@@ -1,0 +1,102 @@
+name: Sync Google Calendar
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-google-calendar
+  cancel-in-progress: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out website
+        uses: actions/checkout@v4
+
+      - name: Install calendar parser
+        run: pip install --disable-pip-version-check icalendar recurring-ical-events
+
+      - name: Fetch Google Calendar data
+        env:
+          CALENDAR_ID: c_e8116b123c05365cd8e0ef349701333319f616f5a2bb3a5a70207c5a1d788f35@group.calendar.google.com
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          import urllib.parse
+          import urllib.request
+          from datetime import date, datetime, timedelta
+          from zoneinfo import ZoneInfo
+
+          import recurring_ical_events
+          from icalendar import Calendar
+
+          calendar_id = urllib.parse.quote(os.environ["CALENDAR_ID"], safe="")
+          url = f"https://calendar.google.com/calendar/ical/{calendar_id}/public/basic.ics"
+          request = urllib.request.Request(url, headers={"User-Agent": "CNR-Budget-Calendar-Sync/1.0"})
+          with urllib.request.urlopen(request, timeout=30) as response:
+              raw_calendar = response.read()
+
+          calendar = Calendar.from_ical(raw_calendar)
+          timezone = ZoneInfo("Asia/Bangkok")
+          today = datetime.now(timezone).date()
+          range_start = datetime.combine(today - timedelta(days=366), datetime.min.time(), timezone)
+          range_end = datetime.combine(today + timedelta(days=731), datetime.max.time(), timezone)
+          components = recurring_ical_events.of(calendar).between(range_start, range_end)
+
+          def local_date(value):
+              if isinstance(value, datetime):
+                  if value.tzinfo is None:
+                      value = value.replace(tzinfo=timezone)
+                  return value.astimezone(timezone).date()
+              if isinstance(value, date):
+                  return value
+              raise TypeError(f"Unsupported calendar date: {value!r}")
+
+          events = []
+          seen = set()
+          for component in components:
+              start_value = component.decoded("DTSTART")
+              end_property = component.get("DTEND")
+              end_value = component.decoded("DTEND") if end_property else start_value
+              start_date = local_date(start_value)
+              end_date = local_date(end_value)
+              if isinstance(start_value, date) and not isinstance(start_value, datetime) and end_date > start_date:
+                  end_date -= timedelta(days=1)
+              if end_date < start_date:
+                  end_date = start_date
+              title = str(component.get("SUMMARY", "กิจกรรม"))
+              key = (title, start_date.isoformat(), end_date.isoformat())
+              if key in seen:
+                  continue
+              seen.add(key)
+              events.append({"title": title, "start": key[1], "end": key[2]})
+
+          events.sort(key=lambda event: (event["start"], event["title"]))
+          output = {
+              "calendar": str(calendar.get("X-WR-CALNAME", "Google Calendar")),
+              "updatedAt": datetime.now(timezone).isoformat(timespec="seconds"),
+              "events": events,
+          }
+          with open("calendar-events.json", "w", encoding="utf-8") as file:
+              json.dump(output, file, ensure_ascii=False, indent=2)
+              file.write("\n")
+          PY
+
+      - name: Publish updated calendar data
+        run: |
+          if git diff --quiet -- calendar-events.json; then
+            echo "Calendar data is already current."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add calendar-events.json
+          git commit -m "Update Google Calendar data"
+          git push
