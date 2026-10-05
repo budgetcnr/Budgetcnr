@@ -1,7 +1,7 @@
 .page-head{padding:32px 0}.page-head h1{font-size:clamp(1.8rem,4vw,2.7rem);line-height:1.35;margin:12px 0 8px}
 .leadership{gap:22px;margin-bottom:48px}.leader{padding:0;text-align:center;border:1px solid #174e85;display:flex;flex-direction:column}.leader:after{display:none}
 .portrait-frame{display:flex;align-items:flex-end;justify-content:center;overflow:hidden;background:linear-gradient(145deg,#e9f3fc,#d3e5f4);border-bottom:3px solid var(--gold)}
-.portrait-frame img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
+.portrait-frame img{display:block;width:100%;height:100%;object-fit:cover;object-position:center top}
 .leader .portrait-frame{height:300px;padding:18px 20px 0;background:radial-gradient(ellipse at 50% 85%,#4a82ad,transparent 70%),linear-gradient(135deg,#103a69,#0b2d55)}
 .leader-info{padding:20px 14px 24px}.leader .leader-info b{font-size:1.25rem;line-height:1.5}.leader .leader-info span{font-size:1rem;color:#deecfb}
 .section-title{font-size:1.6rem;display:flex;align-items:center;gap:12px}.section-title:before{content:'';height:26px;width:5px;border-radius:3px;background:var(--gold)}
@@ -11,9 +11,31 @@
 @media(max-width:900px){.leadership{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.leader .portrait-frame{height:240px;padding:12px 8px 0}.leader-info{padding:16px 10px}.leader .leader-info b{font-size:1.05rem}.leader .leader-info span{font-size:.875rem}.team-card{padding:16px}.person .portrait-frame{height:190px}.office-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.leadership{grid-template-columns:1fr;max-width:380px;margin-inline:auto;gap:20px}.leader .portrait-frame{height:300px;padding-top:16px}.leader .leader-info b{font-size:1.25rem}.leader .leader-info span{font-size:1rem}.team-grid{grid-template-columns:1fr;gap:20px}.office-list{grid-template-columns:repeat(2,minmax(0,1fr))}.person .portrait-frame{height:220px}.content{padding-top:28px}.page-head{padding:26px 0}}
 @media(max-width:360px){.people,.office-list{grid-template-columns:1fr}.person .portrait-frame{height:260px}}
-/* Keep the portrait crop consistent as cards reflow between screen orientations. */
-.person .portrait-frame{height:auto;aspect-ratio:1/1.05;padding:10px 10px 0}
-.person .portrait-frame img{width:100%;height:100%;object-fit:contain;object-position:center bottom}
+/* Keep every portrait at a consistent head-to-waist crop on all screen sizes. */
+.person .portrait-frame{position:relative;height:auto;aspect-ratio:1.15/1;padding:0}
+.person .portrait-frame img{width:100%;height:100%;object-fit:cover;object-position:center top;transform:translateY(var(--head-nudge,0));transform-origin:center top}
+
+/* Source portraits have slightly different transparent space above the head. */
+.portrait-frame img[src*="chanidapa"],
+.portrait-frame img[src*="kanyawi"]{--head-nudge:13px}
+.portrait-frame img[src*="sudarat"]{--head-nudge:12px}
+.portrait-frame img[src*="nabhassorn"],
+.portrait-frame img[src*="tassanee"]{--head-nudge:11px}
+.portrait-frame img[src*="kanokwan"],
+.portrait-frame img[src*="pattra"],
+.portrait-frame img[src*="sasiwimon"],
+.portrait-frame img[src*="thanat"]{--head-nudge:10px}
+.portrait-frame img[src*="jintana"]{--head-nudge:9px}
+.portrait-frame img[src*="jutiphorn"],
+.portrait-frame img[src*="panthakorn"]{--head-nudge:7px}
+.portrait-frame img[src*="chutima"]{--head-nudge:6px}
+.portrait-frame img[src*="kunakorn"],
+.portrait-frame img[src*="manatsawi"],
+.portrait-frame img[src*="serm"]{--head-nudge:5px}
+.portrait-frame img[src*="wasin"]{--head-nudge:4px}
+.portrait-frame img[src*="prapaporn"]{--head-nudge:2px}
+.portrait-frame img[src*="dennapa"]{--head-nudge:1px}
+.person .portrait-frame img[src*="wichuda"]{width:80%;--head-nudge:0}
 @media(max-width:900px){.person .portrait-frame{height:auto}}
 @media(max-width:620px){.person .portrait-frame{height:auto}}
 @media(max-width:360px){.person .portrait-frame{height:auto}}
