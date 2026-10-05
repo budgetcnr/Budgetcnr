@@ -2,7 +2,8 @@ name: Sync Google Calendar
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    # 16:00 Asia/Bangkok (UTC+7)
+    - cron: "0 9 * * *"
   workflow_dispatch:
 
 permissions:
