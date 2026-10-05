@@ -36,7 +36,7 @@
 .portrait-frame img[src*="prapaporn"]{--head-nudge:2px}
 .portrait-frame img[src*="dennapa"]{--head-nudge:1px}
 .person .portrait-frame img[src*="wichuda"]{width:80%;--head-nudge:0}
-.person .portrait-frame img[src*="nabhassorn-plan"]{width:62%;--head-nudge:-2px}
+.person .portrait-frame img[src*="nabhassorn-plan"]{width:55%;transform:translateY(-12px) scale(1.45);transform-origin:center top}
 @media(max-width:900px){.person .portrait-frame{height:auto}}
 @media(max-width:620px){.person .portrait-frame{height:auto}}
 @media(max-width:360px){.person .portrait-frame{height:auto}}
