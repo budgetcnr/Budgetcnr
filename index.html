@@ -25,6 +25,42 @@
     .contact-option-icon{border-radius:14px}
     @media(max-width:900px){.hero-copy{padding-top:0}.hero-copy .mini-dashboard{margin-top:18px}.hero-grid>div:first-child{width:58%}}
     @media(max-width:580px){.hero-copy{width:100%;padding-bottom:8px}.hero-copy .mini-dashboard{margin-top:18px}.hero-copy .dash-card{padding:9px}.hero-copy .dash-card b{font-size:.82rem}.hero-leaders{margin-top:-18px}.quick{margin-top:14px}}
+    /* Larger leadership portrait group with a protected dashboard area */
+    .hero-grid{grid-template-columns:minmax(0,1.06fr) minmax(0,.94fr);gap:34px}
+    .hero-copy{min-width:0;z-index:3}
+    .hero-copy .mini-dashboard{width:94%;max-width:620px}
+    .hero-leaders{min-height:620px;margin-bottom:-44px;z-index:4}
+    .hero-leader{width:72%;z-index:2}
+    .hero-leader.left{left:-20%;transform:translateX(0) scale(1.02)}
+    .hero-leader.right{right:-20%;transform:translateX(0) scale(1.02)}
+    .hero-leader.director{width:88%;z-index:5;transform:scale(1.04)}
+    .hero-leader img{height:580px}
+    .hero-leader.director img{height:615px}
+    @media(max-width:900px){
+      .hero-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:16px;min-height:625px}
+      .hero-grid>div:first-child{width:auto}
+      .hero-copy{padding-top:12px}
+      .hero-copy .mini-dashboard{width:96%}
+      .hero-leaders{position:relative;right:auto;bottom:auto;width:100%;min-height:605px;margin:0 0 -44px}
+      .hero-leader{width:90%}
+      .hero-leader.left{left:-27%}
+      .hero-leader.right{right:-27%}
+      .hero-leader.director{width:104%}
+      .hero-leader img{height:570px}
+      .hero-leader.director img{height:605px}
+    }
+    @media(max-width:720px){
+      .hero-grid{display:block;min-height:0}
+      .hero-grid>div.hero-copy:first-child{width:100%}
+      .hero-copy{padding-top:0}
+      .hero-copy .mini-dashboard{width:100%;max-width:none}
+      .hero-leaders{min-height:485px;margin-top:14px;margin-bottom:-34px}
+      .hero-leader.left{left:-18%}
+      .hero-leader.right{right:-18%}
+      .hero-leader img{height:455px}
+      .hero-leader.director img{height:482px}
+    }
+    @media(max-width:480px){.hero-grid .hero-leaders{display:none}}
   </style>
   <link rel="stylesheet" href="navigation.css">
   <script src="navigation.js" defer></script>
