@@ -1,0 +1,15 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "budgetcnr",
+  "main": "cloudflare/worker.mjs",
+  "compatibility_date": "2026-10-06",
+  "build": { "command": "node scripts/build-cloudflare-assets.mjs" },
+  "assets": { "directory": "./.cloudflare-assets", "binding": "ASSETS" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "cnr-tuition",
+      "database_id": "0a340b56-cc53-4e0c-9dd0-c4343aadbdf3"
+    }
+  ]
+}
