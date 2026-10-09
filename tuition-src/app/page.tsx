@@ -141,23 +141,22 @@ export default function Home() {
             <p className="text-sm text-slate-500">โรงเรียนชิโนรสวิทยาลัย</p>
           </div>
           <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" className="ml-auto h-11 w-11 rounded-2xl" aria-label="เมนู"><Menu className="h-5 w-5" /></Button></DropdownMenuTrigger>
-            <DropdownMenuContent align="end"><DropdownMenuItem onSelect={() => switchMode(null)}>หน้าแรก</DropdownMenuItem><DropdownMenuItem onSelect={() => switchMode("student")}>โหมดนักเรียน / ผู้ปกครอง</DropdownMenuItem><DropdownMenuItem onSelect={() => switchMode("teacher")}>โหมดครูที่ปรึกษา</DropdownMenuItem></DropdownMenuContent>
+            <DropdownMenuContent align="end"><DropdownMenuItem asChild><a href="https://budgetcnr.github.io/Budgetcnr/">หน้าเว็บหลัก</a></DropdownMenuItem><DropdownMenuItem onSelect={() => switchMode(null)}>หน้าระบบค่าเทอม</DropdownMenuItem><DropdownMenuItem onSelect={() => switchMode("student")}>โหมดนักเรียน / ผู้ปกครอง</DropdownMenuItem><DropdownMenuItem onSelect={() => switchMode("teacher")}>โหมดครูที่ปรึกษา</DropdownMenuItem></DropdownMenuContent>
           </DropdownMenu>
         </div>
       </header>
 
-      {!result && !studentOpen && <nav aria-label="เลือกโหมดผู้ใช้งาน" className="mode-selector">
-        <button type="button" aria-pressed={mode==="student"} onClick={()=>switchMode("student")}><GraduationCap aria-hidden="true"/>นักเรียน / ผู้ปกครอง</button>
-        <button type="button" aria-pressed={mode==="teacher"} onClick={()=>switchMode("teacher")}><TeacherIcon />ครูที่ปรึกษา</button>
-      </nav>}
       {!result ? (
         <div className="login-shell">
           {!studentOpen && <div className="login-heading">
             <p className="portal-kicker">CNR · TUITION</p>
             <h1>ตรวจสอบค่าเทอม</h1>
           </div>}
+          {!studentOpen && <nav aria-label="เลือกโหมดผู้ใช้งาน" className={mode ? "mode-selector" : "mode-selector mode-choice-grid"}>
+            <button type="button" aria-pressed={mode==="student"} onClick={()=>switchMode("student")}><GraduationCap aria-hidden="true"/>นักเรียน / ผู้ปกครอง</button>
+            <button type="button" aria-pressed={mode==="teacher"} onClick={()=>switchMode("teacher")}><TeacherIcon />ครูที่ปรึกษา</button>
+          </nav>}
           <div className="login-grid is-result">
-          {!mode && <p className="mode-prompt">เลือกโหมดด้านบนเพื่อเข้าสู่ระบบ</p>}
           {mode==="student" && <StudentLookup key={lookupKey} onResultChange={setStudentOpen} />}
           {mode==="teacher" && <Card className="login-card teacher-card">
             <CardHeader className="login-card-head">

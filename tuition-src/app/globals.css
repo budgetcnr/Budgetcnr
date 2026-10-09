@@ -26,11 +26,14 @@
   --font-sans: "IBM Plex Sans Thai", "Leelawadee UI", Tahoma, Arial, sans-serif;
 }
 * { border-color: var(--border); }
-body { margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
+html { min-height: 100%; background: #edf2f8; color-scheme: light; }
+body { min-height: 100svh; margin: 0; background: var(--background); color: var(--foreground); font-family: var(--font-sans); }
 button, input { font: inherit; }
 
 .tuition-app {
-  background: radial-gradient(ellipse at 15% 15%, #dcedf5 0, transparent 42%), radial-gradient(ellipse at 90% 80%, #f5eedc 0, transparent 42%), #edf2f8;
+  width: 100%; min-height: 100svh; border-radius: 0;
+  background-color: #edf2f8;
+  background-image: linear-gradient(135deg, #e3f1f8 0%, #edf2f8 58%, #f5f0e3 100%);
 }
 .dashboard-glass { border: 1px solid #ffffffd9; background: #ffffffc9; border-radius: 24px; backdrop-filter: blur(20px); box-shadow: 8px 8px 24px #18385d12, -5px -5px 18px #ffffff80; }
 .class-chip { border-radius: 12px; padding: 6px 12px; background: #eaf1fa; color: #082b5c; font-size: 16px; font-weight: 600; }
@@ -41,7 +44,7 @@ button, input { font: inherit; }
 .portal-kicker { color: #5d6d84; font-size: 11px; font-weight: 600; letter-spacing: .2em; margin-bottom: 12px; }
 .login-heading h1 { font-size: clamp(28px, 3.2vw, 38px); font-weight: 700; letter-spacing: -.035em; color: #082b5c; }
 .login-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; align-items: stretch; }
-.mode-selector { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; padding:24px 16px 0; }
+.mode-selector { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; padding:0 0 24px; }
 .mode-selector button { display:flex; align-items:center; justify-content:center; gap:10px; padding:14px 20px; border:1px solid #b9cde0; border-radius:16px; background:#fff; color:#082b5c; font-weight:600; }
 .mode-selector button[aria-pressed="true"] { background:#082b5c; color:#fff; }
 .mode-selector svg { width:24px; height:24px; }
@@ -84,3 +87,10 @@ button, input { font: inherit; }
   .portal-title { font-size: 21px; }
 }
 @media (prefers-reduced-motion: reduce) { .portal-button { transition: none; } }
+
+.mode-choice-grid { max-width:620px; margin:0 auto; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:24px; padding:8px 0 0; }
+.mode-choice-grid button { flex-direction:column; min-height:220px; gap:20px; padding:28px 20px; border:1px solid #ffffffdd; border-radius:28px; background:#ffffffb3; backdrop-filter:blur(20px); box-shadow:12px 12px 30px #18385d16,-8px -8px 24px #ffffffb3; font-size:20px; transition:transform .18s,box-shadow .18s; }
+.mode-choice-grid button:hover { transform:translateY(-3px); box-shadow:15px 15px 34px #18385d20,-8px -8px 24px #ffffffb3; }
+.mode-choice-grid svg { width:38px; height:38px; }
+@media(max-width:480px) { .mode-choice-grid { gap:14px; } .mode-choice-grid button { min-height:156px; padding:24px 12px; font-size:16px; gap:16px; } .mode-choice-grid svg { width:32px; height:32px; } }
+@media(prefers-reduced-motion:reduce) { .mode-choice-grid button { transition:none; } }
