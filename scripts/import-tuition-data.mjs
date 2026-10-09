@@ -4,9 +4,10 @@ import {createDecipheriv,createHash} from 'node:crypto';
 const tables=['student_roster','teacher_roster','teacher_advisory_rooms','fee_sources','fee_entries','fee_reports','fee_import_state'];
 const databaseId='0a340b56-cc53-4e0c-9dd0-c4343aadbdf3';
 const base='https://api.cloudflare.com/client/v4/accounts/dd35a924592f7b7a82dd21bba6aed1f6/d1/database/'+databaseId;
+let diagnostic='';
 async function api(path='',body){
  const response=await fetch(base+path,{method:body?'POST':'GET',headers:{Authorization:`Bearer ${process.env.CLOUDFLARE_D1_API_TOKEN}`,'Content-Type':'application/json'},...(body?{body:JSON.stringify(body)}:{}),signal:AbortSignal.timeout(60000)});
- const data=await response.json();if(!response.ok||!data.success)throw Error('D1 request failed; HTTP '+response.status);return data.result;
+ const data=await response.json();if(!response.ok||!data.success){diagnostic=' HTTP '+response.status+'; API codes '+(data.errors||[]).map(e=>Number(e.code)).filter(Number.isFinite).join(',');throw Error('D1 request failed');}return data.result;
 }
 async function query(sql,params=[]){const results=await api('/query',{sql,params});if(results.some(r=>!r.success))throw Error('D1 query failed');return results.flatMap(r=>r.results||[]);}
 let stage='secret configuration';
@@ -22,7 +23,7 @@ try {
  stage='validate manifest';
  if(bundle.version!==1||JSON.stringify(Object.keys(bundle.tables))!==JSON.stringify(tables))throw Error('Invalid migration manifest.');
  stage='verify D1 access';
- const metadata=await api();if(metadata.uuid!==databaseId||metadata.name!=='cnr-tuition')throw Error('Wrong destination.');
+ const metadata=await api();if(metadata.uuid!==databaseId||metadata.name!=='cnr-tuition'){diagnostic=' Destination identity mismatch.';throw Error('Wrong destination.');}
  const expected={student_roster:1531,teacher_roster:92,teacher_advisory_rooms:83,fee_sources:38,fee_entries:1351,fee_reports:566,fee_import_state:1};
  // Accept only an empty database or records identical to this import, enabling safe retries.
  stage='check existing destination data';
@@ -51,4 +52,4 @@ try {
  if(enabled!==74)throw Error('Teacher login state mismatch.');
  const summary='Database imported and reconciled. Students: 1531. Student credentials: 1528. Teachers: 92. Enabled teacher accounts: 74. Original Sites remains active; website cutover is a separate step.\n';
  console.log(summary);if(process.env.GITHUB_STEP_SUMMARY)await appendFile(process.env.GITHUB_STEP_SUMMARY,summary);
-}catch{console.error('Import stopped at: '+stage+'. No source credentials are logged.');process.exitCode=1;}
+}catch{console.error('Import stopped at: '+stage+'.'+diagnostic+' No source credentials are logged.');process.exitCode=1;}
