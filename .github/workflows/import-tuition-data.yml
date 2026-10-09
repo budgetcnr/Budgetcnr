@@ -1,6 +1,10 @@
 name: Import tuition data
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - scripts/import-tuition-data.mjs
 permissions:
   contents: read
 concurrency:
