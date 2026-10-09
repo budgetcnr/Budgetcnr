@@ -11,25 +11,90 @@
 @media(max-width:760px){.feature-row{grid-template-columns:1fr}.feature{min-height:88px}.section-head{align-items:flex-start;flex-direction:column}.table-head{display:none}.doc-row{grid-template-columns:minmax(0,1fr) auto;gap:8px;padding:14px}.category{grid-column:1;grid-row:2;margin-left:52px}.download{grid-column:2;grid-row:1/3}.hero-inner{padding:30px 24px 26px}.search-help{display:none}}@media(max-width:480px){.shell{width:calc(100% - 24px)}.topbar .shell span:last-child{display:none}.nav{height:68px}.logo{width:42px;height:42px}.brand b{font-size:14px}.brand small{font-size:10px}.hero{border-radius:20px}.hero-inner{padding:27px 19px 23px}.hero h1{font-size:30px}.hero p{font-size:14px}.search-wrap{margin-top:19px}.content{padding-top:22px}.doc-title{font-size:14px}.doc-sub{font-size:11px}.download{font-size:12px;padding:8px 9px}.doc-row{grid-template-columns:minmax(0,1fr) auto}.foot{flex-direction:column}}
 .category-filter{cursor:pointer;text-align:center;justify-content:center;width:100%;font:inherit;position:relative}.category-filter.active{outline:3px solid #f2c24f;outline-offset:2px}.category-filter .feature-cta{position:absolute;right:16px;top:50%;font-size:26px}.work-icon{width:76px;height:76px;object-fit:cover;border-radius:20px;display:block;flex:none;box-shadow:0 8px 18px #082b5c1c}.format-links{display:flex;justify-content:flex-end;gap:6px}.format{min-width:42px;padding:7px 5px;border:1px solid #cfdded;border-radius:9px;background:#fff;color:var(--blue);font-size:11px;font-weight:700;text-align:center}.format:hover{background:#edf5ff}.format.disabled{background:#f5f6f8;color:#9aa5b4;border-color:#e3e7ed;cursor:default}.table-head,.doc-row{grid-template-columns:minmax(0,1fr) 130px 160px}.doc-row .category{display:none}
 @media(max-width:760px){.table-head{display:none}.doc-row{grid-template-columns:minmax(0,1fr) auto}.format-links{grid-column:2;grid-row:1/3;flex-direction:column}.doc-row .category{display:none}}
+
+:root{--navy:#082b5c;--blue:#0d4b97;--gold:#f2c24f;--ink:#10223d;--muted:#5d6d84;--line:#dfe8f3}
+html{scroll-behavior:smooth}body{font-size:16px}.shell{width:min(1180px,calc(100% - 32px))}
+.topbar{height:auto;font-size:.88rem}.topbar .shell{padding:8px 0;gap:16px}
+.nav{height:auto;position:sticky;top:0;z-index:20;background:rgba(255,255,255,.88);backdrop-filter:blur(16px)}
+.nav .navin{height:auto;min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:flex;align-items:center;gap:12px}.mark{width:54px;height:54px;border-radius:16px;background:#fff;display:grid;place-items:center;overflow:hidden;border:1px solid #e8c56e;box-shadow:0 7px 18px rgba(8,43,92,.16);flex-shrink:0}.mark img{width:100%;height:100%;object-fit:contain}.brand strong{display:block}.brand small{display:block;color:var(--muted)}
+.feature-row{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}.category-filter{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px 12px;min-height:166px;border-radius:19px;color:var(--ink);transition:transform .2s,border-color .2s}
+.category-filter:hover{transform:translateY(-3px);border-color:#aac7e8}.category-filter h3{margin:0;font-size:1rem;font-weight:600;line-height:1.4;white-space:nowrap}.work-icon{width:72px;height:72px;border-radius:20px;object-fit:cover}
+.category-filter:focus-visible,.format:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.table-head,.doc-row{grid-template-columns:minmax(0,1fr) auto;gap:24px}.format-links{grid-column:2;grid-row:auto;flex-direction:row;justify-self:end}.doc-sub{display:block}.format{font-family:inherit;cursor:pointer}.format.disabled{cursor:default}
+[hidden]{display:none!important}
+@media(max-width:900px){.feature-row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:580px){.shell{width:calc(100% - 22px)}.nav .navin{min-height:66px;gap:10px}.brand{gap:8px}.brand strong{font-size:.875rem}.brand small{display:none}.mark{width:42px;height:42px;border-radius:12px}.category-filter{min-height:146px;padding:20px 8px;gap:13px}.category-filter h3{font-size:.92rem}.work-icon{width:64px;height:64px}.doc-row{display:flex;flex-wrap:wrap;gap:12px;padding:16px}.doc-info{flex:1 1 100%}.format-links{margin-left:52px;gap:8px}.doc-sub{margin-top:4px}.hero-inner{padding:27px 20px}.hero h1{font-size:30px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.category-filter{transition:none}}
+
+.site-menu{position:relative;margin-left:auto;flex-shrink:0}
+.site-menu summary{display:flex;align-items:center;justify-content:center;gap:10px;min-height:44px;padding:10px 17px;border:1px solid var(--line);border-radius:12px;background:var(--navy);color:white;cursor:pointer;font-size:1rem;font-weight:600;list-style:none}
+.site-menu summary::-webkit-details-marker{display:none}
+.menu-chevron{transition:transform .15s}
+.site-menu[open] .menu-chevron{transform:rotate(180deg)}
+.site-menu .menu-links{position:absolute;right:0;top:calc(100% + 10px);display:grid;gap:4px;width:240px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 140px);overflow:auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px;box-shadow:0 16px 42px rgba(8,43,92,.18);color:var(--ink)}
+.menu-links a{display:block;padding:11px 14px;border-radius:9px;font-size:1rem;font-weight:500}
+.menu-links a:hover,.menu-links a[aria-current=page]{background:#edf5ff;color:var(--blue)}
+.site-menu summary:focus-visible,.menu-links a:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+html{scroll-padding-top:100px}
+.navin{padding-block:8px}.brand{min-width:0}.mark{flex-shrink:0}.brand .school-name{display:block;color:var(--muted);font-size:.78rem;line-height:1.25}
+@media(max-width:580px){.navin{gap:10px}.brand{gap:8px}.brand strong{font-size:.875rem}.brand .school-name{font-size:.7rem}.mark{width:42px;height:42px;border-radius:12px}.site-menu summary{padding:9px 12px;gap:6px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.menu-chevron{transition:none}}
+
 </style>
+<link rel="icon" type="image/webp" href="cnr-budget-logo.webp">
 </head>
 <body>
-<div class="topbar"><div class="shell"><span>โรงเรียนชิโนรสวิทยาลัย</span><span>บริการข้อมูลเพื่อการดำเนินงานที่โปร่งใส</span></div></div>
-<nav class="nav"><div class="shell"><a class="brand" href="index.html"><span class="logo">◈</span><span><b>กลุ่มบริหารงบประมาณ</b><small>โรงเรียนชิโนรสวิทยาลัย</small></span></a><a class="menu" href="index.html">กลับหน้าหลัก　⌂</a></div></nav>
+<div class="topbar"><div class="shell"><span>โรงเรียนชิโนรสวิทยาลัย</span><span>โปร่งใส • ตรวจสอบได้ • เข้าถึงง่าย</span></div></div>
+<nav class="nav"><div class="shell navin"><a class="brand" href="index.html"><span class="mark"><img src="cnr-budget-logo.webp" alt="ตราสัญลักษณ์กลุ่มบริหารงบประมาณ"></span><span><strong>กลุ่มบริหารงบประมาณ</strong><span class="school-name">โรงเรียนชิโนรสวิทยาลัย</span><small>Budget Management Division</small></span></a><details class="site-menu"><summary>เมนู <span class="menu-chevron" aria-hidden="true">▾</span></summary><div class="menu-links"><a href="index.html">หน้าหลัก</a><a href="index.html#services">บริการ</a><a href="personnel.html">บุคลากร</a><a href="news.html">ข่าวสาร</a><a href="documents/" aria-current="page">เอกสาร</a><a href="index.html#contact">ติดต่อเรา</a></div></details></div></nav>
 <main class="shell"><div class="crumb"><a href="index.html">หน้าหลัก</a>　/　<span>เอกสารและแบบฟอร์ม</span></div>
 <section class="hero"><div class="hero-inner"><div class="eyebrow"><i class="dot"></i> ศูนย์รวมเอกสารออนไลน์</div><h1>เอกสารและแบบฟอร์ม</h1><p>รวมแบบฟอร์มและเอกสารสำหรับการดำเนินงานด้านงบประมาณ ดาวน์โหลดได้สะดวกในที่เดียว</p><div class="stats"><b>ปีงบประมาณ 2570</b><span>·</span><span>แบบฟอร์มอัปเดตล่าสุด</span></div></div></section>
-<div class="content"><div class="feature-row" aria-label="เลือกหมวดเอกสาร"><button class="feature category-filter" data-filter="plan"><img class="work-icon" src="icon-plan.jpg" alt=""><h3>งานแผนงาน</h3><span class="feature-cta">→</span></button><button class="feature category-filter" data-filter="procurement"><img class="work-icon" src="icon-procurement.jpg" alt=""><h3>งานพัสดุ</h3><span class="feature-cta">→</span></button><button class="feature category-filter" data-filter="vehicle"><img class="work-icon" src="icon-vehicle.jpg" alt=""><h3>งานยานพาหนะ</h3><span class="feature-cta">→</span></button><button class="feature category-filter active" data-filter="other"><img class="work-icon" src="icon-other.jpg" alt=""><h3>อื่น ๆ</h3><span class="feature-cta">→</span></button></div>
+<div class="content"><div class="feature-row" aria-label="เลือกหมวดเอกสาร"><button class="feature category-filter" data-filter="plan"><img class="work-icon" src="icon-plan.jpg" alt=""><h3>งานแผนงาน</h3></button><button class="feature category-filter" data-filter="procurement"><img class="work-icon" src="icon-procurement.jpg" alt=""><h3>งานพัสดุ</h3></button><button class="feature category-filter" data-filter="vehicle"><img class="work-icon" src="icon-vehicle.jpg" alt=""><h3>งานยานพาหนะ</h3></button><button class="feature category-filter active" data-filter="other"><img class="work-icon" src="icon-other.jpg" alt=""><h3>อื่น ๆ</h3></button></div>
 <div class="section-head"><div><h2>รายการเอกสาร</h2><p id="resultCount">เอกสารและแบบฟอร์มสำหรับครูและบุคลากร</p></div></div>
-<div class="panel" id="list"><div class="table-head"><span>ชื่อเอกสาร</span><span>หมวดหมู่</span><span style="text-align:right">ดาวน์โหลด</span></div>
-<article class="doc-row filterable" data-category="other" data-search="ผง 01 แบบฟอร์มขออนุมัติโครงการงบประมาณ ปี 2570"><div class="doc-info"><span class="mini-file">DOC</span><span><span class="doc-title">แบบฟอร์ม ผง. 01</span><span class="doc-sub">ปีงบประมาณ 2570</span></span></div><div class="format-links"><a class="format" href="downloads/phong-01-2570.docx" download>DOCX</a><button class="format disabled" disabled>PDF</button><button class="format disabled" disabled>Pages</button></div></article>
-<article class="doc-row filterable" data-category="other" data-search="ผง 02 แบบรายงานผลการดำเนินโครงการงบประมาณ ปี 2570"><div class="doc-info"><span class="mini-file">DOC</span><span><span class="doc-title">แบบฟอร์ม ผง. 02</span><span class="doc-sub">ปีงบประมาณ 2570</span></span></div><div class="format-links"><a class="format" href="downloads/phong-02-2570.docx" download>DOCX</a><button class="format disabled" disabled>PDF</button><button class="format disabled" disabled>Pages</button></div></article>
-<article class="doc-row filterable" data-category="other" data-search="ผง 03 แบบตรวจสอบเอกสารงบประมาณ ปี 2570"><div class="doc-info"><span class="mini-file" style="color:#b74c43;background:#fff5f4">PDF</span><span><span class="doc-title">แบบตรวจสอบ ผง. 03</span><span class="doc-sub">กำลังจัดเตรียมไฟล์สำหรับดาวน์โหลด</span></span></div><div class="format-links"><button class="format disabled" disabled>DOCX</button><button class="format disabled" disabled>PDF</button><button class="format disabled" disabled>Pages</button></div></article>
-<article class="doc-row filterable" data-category="vehicle" data-search="งานยานพาหนะ แบบฟอร์มขอใช้รถ ใบขออนุญาตใช้รถ"><div class="doc-info"><span class="mini-file" style="color:#6446a8;background:#f4f0ff">DOC</span><span><span class="doc-title">แบบฟอร์มงานยานพาหนะ</span><span class="doc-sub">กำลังจัดเตรียมไฟล์สำหรับดาวน์โหลด</span></span></div><div class="format-links"><button class="format disabled" disabled>DOCX</button><button class="format disabled" disabled>PDF</button><button class="format disabled" disabled>Pages</button></div></article>
-<div class="empty" id="empty">ไม่พบเอกสารที่ตรงกับคำค้น ลองค้นด้วยคำอื่นหรือเลือก “ทั้งหมด”</div></div>
+<div class="panel" id="list"><div class="table-head"><span>ชื่อเอกสาร</span><span style="text-align:right">ดาวน์โหลด</span></div>
+<article class="doc-row filterable" data-category="other"><div class="doc-info"><span class="mini-file">DOC</span><span><span class="doc-title">แบบฟอร์ม ผง. 01</span><span class="doc-sub">ปีงบประมาณ 2570</span></span></div><div class="format-links"><a class="format" href="downloads/phong-01-2570.docx" download>DOCX</a><button class="format disabled" disabled>PDF</button><button class="format disabled" disabled>Pages</button></div></article>
+<article class="doc-row filterable" data-category="other"><div class="doc-info"><span class="mini-file">DOC</span><span><span class="doc-title">แบบฟอร์ม ผง. 02</span><span class="doc-sub">ปีงบประมาณ 2570</span></span></div><div class="format-links"><a class="format" href="downloads/phong-02-2570.docx" download>DOCX</a><button class="format disabled" disabled>PDF</button><button class="format disabled" disabled>Pages</button></div></article>
+<article class="doc-row filterable" data-category="other"><div class="doc-info"><span class="mini-file" style="color:#b74c43;background:#fff5f4">PDF</span><span><span class="doc-title">แบบตรวจสอบ ผง. 03</span><span class="doc-sub">กำลังจัดเตรียมไฟล์สำหรับดาวน์โหลด</span></span></div><div class="format-links"><button class="format disabled" disabled>DOCX</button><button class="format disabled" disabled>PDF</button><button class="format disabled" disabled>Pages</button></div></article>
+<article class="doc-row filterable" data-category="vehicle"><div class="doc-info"><span class="mini-file" style="color:#6446a8;background:#f4f0ff">DOC</span><span><span class="doc-title">แบบฟอร์มงานยานพาหนะ</span><span class="doc-sub">กำลังจัดเตรียมไฟล์สำหรับดาวน์โหลด</span></span></div><div class="format-links"><button class="format disabled" disabled>DOCX</button><button class="format disabled" disabled>PDF</button><button class="format disabled" disabled>Pages</button></div></article>
+<div class="empty" id="empty">กำลังจัดเตรียมเอกสารสำหรับหมวดนี้</div></div>
 <div class="note"><span class="note-icon">ⓘ</span><span><b>หมายเหตุ</b><br>เอกสารที่กดดาวน์โหลดได้จะแสดงชื่อไฟล์และปีงบประมาณกำกับ หากต้องการสอบถามเกี่ยวกับแบบฟอร์ม ติดต่อกลุ่มบริหารงบประมาณในวันและเวลาราชการ</span></div></div></main>
 <footer><div class="shell foot"><span>© 2569 กลุ่มบริหารงบประมาณ โรงเรียนชิโนรสวิทยาลัย</span><span>เพื่อการเข้าถึงบริการอย่างสะดวกและโปร่งใส</span></div></footer>
 <script>
 const items=[...document.querySelectorAll('.filterable')],categoryButtons=[...document.querySelectorAll('.category-filter')],empty=document.querySelector('#empty'),count=document.querySelector('#resultCount');let active='other';function filter(){let n=0;items.forEach(el=>{const show=active==='all'||el.dataset.category===active;el.hidden=!show;if(show&&el.classList.contains('doc-row'))n++});empty.style.display=n?'none':'block';count.textContent=`พบ ${n} รายการ`}categoryButtons.forEach(b=>b.addEventListener('click',()=>{categoryButtons.forEach(x=>x.classList.toggle('active',x===b));active=b.dataset.filter;filter();document.querySelector('#list').scrollIntoView({behavior:'smooth',block:'start'})}));filter();
 </script>
+<script>
+document.querySelectorAll('.site-menu').forEach(menu => {
+  const trigger = menu.querySelector('summary');
+  const links = [...menu.querySelectorAll('a')];
+  const close = (restoreFocus = false) => {
+    menu.open = false;
+    if (restoreFocus) trigger.focus();
+  };
+  document.addEventListener('click', event => {
+    if (!menu.contains(event.target)) close();
+  });
+  menu.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && menu.open) {
+      event.preventDefault();
+      close(true);
+    }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      menu.open = true;
+      const current = links.indexOf(document.activeElement);
+      const next = current < 0 ? (event.key === 'ArrowDown' ? 0 : links.length - 1) : (current + (event.key === 'ArrowDown' ? 1 : -1) + links.length) % links.length;
+      links[next].focus();
+    }
+  });
+  menu.addEventListener('focusout', () => {
+    setTimeout(() => {
+      if (!menu.contains(document.activeElement)) close();
+    }, 0);
+  });
+  links.forEach(link => link.addEventListener('click', () => close()));
+});
+
+</script>
 </body></html>
+
 
