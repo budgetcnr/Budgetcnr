@@ -5,8 +5,8 @@ const root = resolve(import.meta.dirname, "..");
 const output = join(root, ".cloudflare-assets");
 // Only website assets enter the public deployment. Server source, SQL,
 // credential files and migration exports are deliberately outside this list.
-const publicDirectories = new Set(["assets", "documents", "downloads", "insurance", "personnel", "news"]);
-const publicExtensions = new Set([".html", ".css", ".js", ".png", ".jpg", ".jpeg", ".webp", ".svg", ".ico", ".gif", ".avif", ".pdf", ".pages", ".docx", ".woff", ".woff2"]);
+const publicDirectories = new Set(["assets", "documents", "downloads", "insurance", "personnel", "news", "tuition"]);
+const publicExtensions = new Set([".html", ".css", ".js", ".png", ".jpg", ".jpeg", ".webp", ".svg", ".ico", ".gif", ".avif", ".pdf", ".pages", ".docx", ".woff", ".woff2", ".ttf"]);
 await access(join(root, "index.html"));
 await rm(output, { recursive: true, force: true });
 await mkdir(output, { recursive: true });

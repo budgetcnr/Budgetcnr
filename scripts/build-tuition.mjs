@@ -1,0 +1,16 @@
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {resolve,join} from 'node:path';
+import {createRequire} from 'node:module';
+const root=resolve(import.meta.dirname,'..');
+const source=join(root,'tuition-src');
+const require=createRequire(join(source,'package.json'));
+const {build}=require('esbuild');
+const postcss=require('postcss');const tailwind=require('@tailwindcss/postcss');
+await mkdir(join(root,'tuition/assets'),{recursive:true});
+await mkdir(join(root,'cloudflare'),{recursive:true});
+await build({entryPoints:[join(source,'main.tsx')],outfile:join(root,'tuition/assets/app.js'),bundle:true,minify:true,format:'esm',platform:'browser',target:['safari15','chrome100'],jsx:'automatic',tsconfig:join(source,'tsconfig.json'),define:{'process.env.NODE_ENV':'"production"'}});
+const cssFile=join(source,'app/globals.css');
+const css=await postcss([tailwind({base:source,optimize:true})]).process(await readFile(cssFile,'utf8'),{from:cssFile,to:join(root,'tuition/assets/style.css')});
+await writeFile(join(root,'tuition/assets/style.css'),css.css);
+await build({entryPoints:[join(source,'api.ts')],outfile:join(root,'cloudflare/tuition-api.mjs'),bundle:true,minify:false,format:'esm',platform:'browser',target:'es2022',external:['cloudflare:workers'],tsconfig:join(source,'tsconfig.json')});
+console.log('Built original tuition UI and D1 API.');
