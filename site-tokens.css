@@ -1,0 +1,2 @@
+/* Shared portal tokens. Page-specific colors remain local. */
+:root{--navy:#082b5c;--blue:#0d4b97;--cyan:#39b7d8;--gold:#f2c24f;--ink:#10223d;--muted:#5d6d84;--line:#dfe8f3;--paper:#f5f8fc;--white:#fff;--shadow:0 14px 40px rgba(8,43,92,.10);--font-body:"IBM Plex Sans Thai",system-ui,sans-serif}

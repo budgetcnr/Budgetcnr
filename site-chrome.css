@@ -1,0 +1,6 @@
+/* Header layout shared by the static portal pages. Local variants override this base. */
+.topbar{background:var(--navy);color:#ddecff;font-size:.88rem}
+.topbar .shell{display:flex;justify-content:space-between;gap:16px;padding:8px 0}
+.navin{min-height:76px;display:flex;align-items:center;justify-content:space-between;gap:24px}
+.brand{display:flex;align-items:center;gap:12px}
+.mark img{width:100%;height:100%;object-fit:contain}
