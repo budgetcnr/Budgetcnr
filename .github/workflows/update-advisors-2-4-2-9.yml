@@ -1,0 +1,27 @@
+name: Update advisors for 2-4 and 2-9
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/update-advisors-2-4-2-9.yml
+      - scripts/update-advisors-2-4-2-9.mjs
+      - cloudflare/update-advisors-2-4-2-9.sql
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cnr-tuition-database
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Apply and verify requested advisor assignments
+        run: node scripts/update-advisors-2-4-2-9.mjs
+        env:
+          CLOUDFLARE_D1_API_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
