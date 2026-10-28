@@ -1,0 +1,28 @@
+name: Import authoritative tuition sheet
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/import-tuition-sheet.yml
+      - scripts/import-tuition-sheet.mjs
+      - cloudflare/tuition-sheet-update.enc.json
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: cnr-tuition-database
+  cancel-in-progress: false
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Import source sheet and activate fee version
+        run: node scripts/import-tuition-sheet.mjs
+        env:
+          CLOUDFLARE_D1_API_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          ROSTER_CREDENTIAL_KEY: ${{ secrets.ROSTER_CREDENTIAL_KEY }}

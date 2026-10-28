@@ -37,7 +37,7 @@ async function allowLogin(kind, id) {
 
 // tuition-src/lib/fee-status.ts
 function confirmedPaidCohort(classRoom, reportVersion) {
-  if (reportVersion !== "arrears-20260910-cb15bb667adb" || !/^ม\.[14]\s*\/\s*\d+$/.test(classRoom)) return null;
+  if (!["arrears-20260910-cb15bb667adb", "arrears-sheet-20261028"].includes(reportVersion) || !/^ม\.[14]\s*\/\s*\d+$/.test(classRoom)) return null;
   return {
     charges: [{ academicYear: 2569, semester: 1, classRoom, item: "\u0E04\u0E48\u0E32\u0E1A\u0E33\u0E23\u0E38\u0E07\u0E01\u0E32\u0E23\u0E28\u0E36\u0E01\u0E29\u0E32", due: null, paid: null, outstanding: 0, updatedAt: "9 \u0E15.\u0E04. 2569" }],
     chargesAvailable: true,
