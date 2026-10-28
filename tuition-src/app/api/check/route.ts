@@ -39,11 +39,11 @@ export async function POST(request: Request) {
       if(!valid || !teacher?.login_enabled) return Response.json({error:"ข้อมูลเข้าสู่ระบบไม่ถูกต้อง หรือบัญชียังไม่เปิดใช้งาน"},{status:401,headers});
       const rooms=(await db.prepare("SELECT DISTINCT class_room FROM teacher_advisory_rooms WHERE teacher_id=?").bind(teacher.id).all<{class_room:string}>()).results;
       if(!rooms.length) return Response.json({error:"ยังไม่มีห้องที่ปรึกษาที่ได้รับการยืนยัน"},{status:403,headers});
-      const roster=(await db.prepare(`SELECT student_id,full_name,class_room,roll_number FROM student_roster
-        WHERE class_room IN (SELECT class_room FROM teacher_advisory_rooms WHERE teacher_id=?) ORDER BY class_room,roll_number,student_id`).bind(teacher.id).all<{student_id:string;full_name:string;class_room:string;roll_number:number}>()).results;
+      const roster=(await db.prepare(`SELECT student_id,full_name,class_room,roll_number,(SELECT study_program FROM student_programs p WHERE p.student_id=student_roster.student_id) AS study_program,(SELECT term1_room FROM student_programs p WHERE p.student_id=student_roster.student_id) AS term1_room,(SELECT class_history FROM student_programs p WHERE p.student_id=student_roster.student_id) AS class_history FROM student_roster
+        WHERE class_room IN (SELECT class_room FROM teacher_advisory_rooms WHERE teacher_id=?) ORDER BY class_room,roll_number,student_id`).bind(teacher.id).all<{study_program:string|null;term1_room:string|null;class_history:string|null;student_id:string;full_name:string;class_room:string;roll_number:number}>()).results;
       const students=[];
       const fees=await findRosterFees(roster);
-      for(const s of roster) students.push({studentId:s.student_id,fullName:s.full_name,classRoom:s.class_room,rollNumber:s.roll_number,...fees.get(s.student_id)});
+      for(const s of roster) students.push({studentId:s.student_id,fullName:s.full_name,classRoom:s.class_room,rollNumber:s.roll_number,studyProgram:s.study_program,classHistory:JSON.parse(s.class_history||'[]'),...fees.get(s.student_id)});
       return Response.json({teacher:{id:teacherId,name:teacher.full_name,classRoom:rooms.map(r=>r.class_room).join(", ")},students,demo:false,updatedAt:students.find(s=>s.asOf)?.asOf ?? "ยังไม่มีข้อมูล"},{headers});
     } catch { return Response.json({error:"ระบบข้อมูลไม่พร้อมใช้งาน กรุณาลองใหม่ภายหลัง"},{status:503,headers}); }
   }
@@ -66,3 +66,4 @@ export async function POST(request: Request) {
   await new Promise((resolve) => setTimeout(resolve, 450));
   return Response.json({ error: "รหัสบุคลากรหรือรหัสผ่านไม่ถูกต้อง" }, { status: 401 });
 }
+

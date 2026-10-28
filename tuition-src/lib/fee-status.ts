@@ -5,7 +5,7 @@ type Entry = Term & { item:string; outstanding_cents:number };
 // for current M.1 and M.4 because those cohorts have paid in full.
 // Bind this exception to the existing snapshot, not every future import.
 export function confirmedPaidCohort(classRoom: string, reportVersion: string) {
-  if (reportVersion !== "arrears-20260910-cb15bb667adb" || !/^ม\.[14]\s*\/\s*\d+$/.test(classRoom)) return null;
+  if (!["arrears-20260910-cb15bb667adb", "arrears-sheet-20261028"].includes(reportVersion) || !/^ม\.[14]\s*\/\s*\d+$/.test(classRoom)) return null;
   return {
     charges: [{ academicYear:2569, semester:1, classRoom, item:"ค่าบำรุงการศึกษา", due:null, paid:null, outstanding:0, updatedAt:"9 ต.ค. 2569" }],
     chargesAvailable:true, reportedTotal:0, detailsAvailable:true,
@@ -24,3 +24,4 @@ export function includePaidTerms(entries: Entry[], terms: Term[]) {
   }
   return result.sort((a,b)=>b.academic_year-a.academic_year || b.semester-a.semester);
 }
+

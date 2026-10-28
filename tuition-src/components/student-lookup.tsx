@@ -13,7 +13,7 @@ type Charge = {
   item: string; due: number | null; paid: number | null; outstanding: number; updatedAt: string;
 };
 export type LookupResult = {
-  student: { studentId: string; fullName: string; classRoom: string; advisor: string };
+  student: { studentId: string; fullName: string; classRoom: string; advisor: string; studyProgram?: string; classHistory?: {academicYear:number;semester:number;classRoom:string}[] };
   charges: Charge[]; demo: boolean; chargesAvailable?: boolean; reportOnly?: boolean; asOf?: string; reportedTotal?: number; detailsAvailable?: boolean; listedInReport?: boolean;
 };
 const money = (value: number) => new Intl.NumberFormat("th-TH", { maximumFractionDigits: 2 }).format(value);
@@ -73,6 +73,7 @@ export default function StudentLookup({ onResultChange, initialResult, onBack }:
           <Card className="dashboard-glass"><CardContent className="space-y-3 p-6">
             <h3 className="text-xl font-bold text-blue-950">{result.student.fullName}</h3>
             <p className="text-base text-slate-600">รหัสนักเรียน {result.student.studentId} · ชั้นปัจจุบัน {result.student.classRoom}</p>
+            <p className="text-base text-slate-600">กลุ่มวิชา: <span className="font-semibold text-blue-950">{result.student.studyProgram || "ปกติ"}</span></p>
             <p className="text-base text-slate-600">ครูที่ปรึกษา: {result.student.advisor || "ไม่ระบุ"}</p>
             <div className={`rounded-2xl p-5 ${total > 0 || result.chargesAvailable === false ? "bg-blue-950 text-white" : "bg-emerald-50 text-emerald-900"}`}>
               <p className="flex items-center gap-2 text-base"><WalletCards className="h-5 w-5" />ยอดค้างรวมทุกภาคเรียน</p>
@@ -88,7 +89,7 @@ export default function StudentLookup({ onResultChange, initialResult, onBack }:
             const year = rows[0].academicYear;
             const shortYear = String(year < 2400 ? year + 543 : year).slice(-2);
             return <Card key={key} className="dashboard-glass"><CardContent className="p-5 sm:p-6">
-              <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex flex-wrap items-center gap-3">{rows[0].classRoom && <span className="class-chip">{rows[0].classRoom}</span>}<h4 className="text-lg font-semibold text-blue-950">ภาคเรียนที่ {rows[0].semester}/{shortYear}</h4></div>
+              <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex flex-wrap items-center gap-3">{rows[0].classRoom && <span className="class-chip">{historicalClass(result.student.classRoom, year, rows[0].semester, result.student.classHistory)}</span>}<h4 className="text-lg font-semibold text-blue-950">ภาคเรียนที่ {rows[0].semester}/{shortYear}</h4></div>
                 <span className={`rounded-full px-3 py-1 text-sm font-medium ${outstanding === 0 ? "bg-emerald-50 text-emerald-800" : paid > 0 ? "bg-amber-50 text-amber-800" : "bg-red-50 text-red-700"}`}>{status}</span></div>
               <div className="mt-5 space-y-5">{rows.map((row, index) => <div key={index}>
                 <p className="font-medium">{row.item}</p>
@@ -112,4 +113,14 @@ export default function StudentLookup({ onResultChange, initialResult, onBack }:
       )}
     </section>
   );
+}
+
+
+export function historicalClass(currentRoom:string, academicYear:number, semester:number, history?:{academicYear:number;semester:number;classRoom:string}[]) {
+  const confirmed=history?.find(r=>r.academicYear===academicYear&&r.semester===semester);
+  if(confirmed)return confirmed.classRoom;
+  const match=/^ม\.(\d+)\/(\d+)$/.exec(currentRoom);
+  if(!match)return 'ไม่ระบุห้อง';
+  const grade=Number(match[1])-(2569-academicYear);
+  return grade>=1&&grade<=6 ? `ม.${grade} (ไม่ยืนยันห้อง)` : 'ไม่ระบุห้อง';
 }

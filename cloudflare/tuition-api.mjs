@@ -1,14 +1,14 @@
-// tuition-src/app/api/check/route.ts
+// cloudflare-port/tuition-src/app/api/check/route.ts
 import { env as env3 } from "cloudflare:workers";
 
-// tuition-src/db/index.ts
+// cloudflare-port/tuition-src/db/index.ts
 import { env } from "cloudflare:workers";
 function getRawDb() {
   if (!env.DB) throw new Error("Database unavailable");
   return env.DB;
 }
 
-// tuition-src/lib/teacher-auth.ts
+// cloudflare-port/tuition-src/lib/teacher-auth.ts
 import { env as env2 } from "cloudflare:workers";
 var encoder = new TextEncoder();
 function hex(bytes) {
@@ -35,7 +35,7 @@ async function allowLogin(kind, id) {
   return Boolean(row && row.count <= 10);
 }
 
-// tuition-src/lib/fee-status.ts
+// cloudflare-port/tuition-src/lib/fee-status.ts
 function confirmedPaidCohort(classRoom, reportVersion) {
   if (!["arrears-20260910-cb15bb667adb", "arrears-sheet-20261028"].includes(reportVersion) || !/^ม\.[14]\s*\/\s*\d+$/.test(classRoom)) return null;
   return {
@@ -59,7 +59,7 @@ function includePaidTerms(entries, terms) {
   return result.sort((a, b) => b.academic_year - a.academic_year || b.semester - a.semester);
 }
 
-// tuition-src/lib/fees.ts
+// cloudflare-port/tuition-src/lib/fees.ts
 async function findRosterFees(students) {
   const db = getRawDb();
   const state = await db.prepare("SELECT version FROM fee_import_state WHERE id='active'").first();
@@ -107,7 +107,7 @@ async function findStudentFees(studentId, classRoom) {
   };
 }
 
-// tuition-src/app/api/check/route.ts
+// cloudflare-port/tuition-src/app/api/check/route.ts
 var DEMO_RESULT = {
   teacher: { id: "999999", name: "\u0E04\u0E23\u0E39\u0E15\u0E31\u0E27\u0E2D\u0E22\u0E48\u0E32\u0E07", classRoom: "\u0E21.1/1" },
   students: [
@@ -140,11 +140,11 @@ async function POST(request) {
       if (!valid || !teacher?.login_enabled) return Response.json({ error: "\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E40\u0E02\u0E49\u0E32\u0E2A\u0E39\u0E48\u0E23\u0E30\u0E1A\u0E1A\u0E44\u0E21\u0E48\u0E16\u0E39\u0E01\u0E15\u0E49\u0E2D\u0E07 \u0E2B\u0E23\u0E37\u0E2D\u0E1A\u0E31\u0E0D\u0E0A\u0E35\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E40\u0E1B\u0E34\u0E14\u0E43\u0E0A\u0E49\u0E07\u0E32\u0E19" }, { status: 401, headers: headers2 });
       const rooms = (await db.prepare("SELECT DISTINCT class_room FROM teacher_advisory_rooms WHERE teacher_id=?").bind(teacher.id).all()).results;
       if (!rooms.length) return Response.json({ error: "\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E21\u0E35\u0E2B\u0E49\u0E2D\u0E07\u0E17\u0E35\u0E48\u0E1B\u0E23\u0E36\u0E01\u0E29\u0E32\u0E17\u0E35\u0E48\u0E44\u0E14\u0E49\u0E23\u0E31\u0E1A\u0E01\u0E32\u0E23\u0E22\u0E37\u0E19\u0E22\u0E31\u0E19" }, { status: 403, headers: headers2 });
-      const roster = (await db.prepare(`SELECT student_id,full_name,class_room,roll_number FROM student_roster
+      const roster = (await db.prepare(`SELECT student_id,full_name,class_room,roll_number,(SELECT study_program FROM student_programs p WHERE p.student_id=student_roster.student_id) AS study_program,(SELECT term1_room FROM student_programs p WHERE p.student_id=student_roster.student_id) AS term1_room,(SELECT class_history FROM student_programs p WHERE p.student_id=student_roster.student_id) AS class_history FROM student_roster
         WHERE class_room IN (SELECT class_room FROM teacher_advisory_rooms WHERE teacher_id=?) ORDER BY class_room,roll_number,student_id`).bind(teacher.id).all()).results;
       const students = [];
       const fees = await findRosterFees(roster);
-      for (const s of roster) students.push({ studentId: s.student_id, fullName: s.full_name, classRoom: s.class_room, rollNumber: s.roll_number, ...fees.get(s.student_id) });
+      for (const s of roster) students.push({ studentId: s.student_id, fullName: s.full_name, classRoom: s.class_room, rollNumber: s.roll_number, studyProgram: s.study_program, classHistory: JSON.parse(s.class_history || "[]"), ...fees.get(s.student_id) });
       return Response.json({ teacher: { id: teacherId, name: teacher.full_name, classRoom: rooms.map((r) => r.class_room).join(", ") }, students, demo: false, updatedAt: students.find((s) => s.asOf)?.asOf ?? "\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E21\u0E35\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25" }, { headers: headers2 });
     } catch {
       return Response.json({ error: "\u0E23\u0E30\u0E1A\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E44\u0E21\u0E48\u0E1E\u0E23\u0E49\u0E2D\u0E21\u0E43\u0E0A\u0E49\u0E07\u0E32\u0E19 \u0E01\u0E23\u0E38\u0E13\u0E32\u0E25\u0E2D\u0E07\u0E43\u0E2B\u0E21\u0E48\u0E20\u0E32\u0E22\u0E2B\u0E25\u0E31\u0E07" }, { status: 503, headers: headers2 });
@@ -168,22 +168,22 @@ async function POST(request) {
   return Response.json({ error: "\u0E23\u0E2B\u0E31\u0E2A\u0E1A\u0E38\u0E04\u0E25\u0E32\u0E01\u0E23\u0E2B\u0E23\u0E37\u0E2D\u0E23\u0E2B\u0E31\u0E2A\u0E1C\u0E48\u0E32\u0E19\u0E44\u0E21\u0E48\u0E16\u0E39\u0E01\u0E15\u0E49\u0E2D\u0E07" }, { status: 401 });
 }
 
-// tuition-src/app/api/student-check/route.ts
+// cloudflare-port/tuition-src/app/api/student-check/route.ts
 import { env as env5 } from "cloudflare:workers";
 
-// tuition-src/lib/roster.ts
+// cloudflare-port/tuition-src/lib/roster.ts
 import { env as env4 } from "cloudflare:workers";
 async function findRosterStudent(studentId, nationalId) {
   if (!env4.ROSTER_CREDENTIAL_KEY) throw new Error("Credential key unavailable");
-  const row = await getRawDb().prepare("SELECT student_id, roll_number, full_name, class_room, advisor, status, credential_hash FROM student_roster WHERE student_id = ?").bind(studentId).first();
+  const row = await getRawDb().prepare("SELECT s.*, p.study_program,p.current_room,p.term1_room,p.class_history FROM student_roster s LEFT JOIN student_programs p ON p.student_id=s.student_id WHERE s.student_id = ?").bind(studentId).first();
   const key = await crypto.subtle.importKey("raw", new TextEncoder().encode(env4.ROSTER_CREDENTIAL_KEY), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
   const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${studentId}:${nationalId}`));
   const hash = Array.from(new Uint8Array(digest), (value) => value.toString(16).padStart(2, "0")).join("");
   if (!row?.credential_hash || row.credential_hash !== hash) return null;
-  return { studentId: row.student_id, rollNumber: row.roll_number, fullName: row.full_name, classRoom: row.class_room, advisor: row.advisor, status: row.status };
+  return { studentId: row.student_id, rollNumber: row.roll_number, fullName: row.full_name, classRoom: row.current_room || row.class_room, classHistory: JSON.parse(row.class_history || "[]"), advisor: row.advisor, studyProgram: row.study_program, status: row.status };
 }
 
-// tuition-src/app/api/student-check/route.ts
+// cloudflare-port/tuition-src/app/api/student-check/route.ts
 var headers = { "cache-control": "no-store", "pragma": "no-cache" };
 async function POST2(request) {
   let payload;

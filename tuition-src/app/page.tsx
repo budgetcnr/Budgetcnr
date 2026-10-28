@@ -13,7 +13,7 @@ import { Progress } from "@/components/ui/progress";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 type Charge = { item: string; outstanding: number; updatedAt: string; due?: number | null; paid?: number | null; academicYear?:number; semester?:number; classRoom?:string; paymentDate?: string };
-type Student = { studentId: string; fullName: string; classRoom: string; rollNumber?: number; charges: Charge[]; chargesAvailable?: boolean; reportedTotal?: number; asOf?:string; reportOnly?:boolean; detailsAvailable?:boolean; listedInReport?:boolean };
+type Student = { studyProgram?: string; classHistory?: {academicYear:number;semester:number;classRoom:string}[]; studentId: string; fullName: string; classRoom: string; rollNumber?: number; charges: Charge[]; chargesAvailable?: boolean; reportedTotal?: number; asOf?:string; reportOnly?:boolean; detailsAvailable?:boolean; listedInReport?:boolean };
 type Result = {
   teacher: { id: string; name: string; classRoom: string };
   students: Student[];
@@ -65,7 +65,7 @@ export default function Home() {
     signOut(); setSelected(null); setStudentOpen(false); setLookupKey(k=>k+1); setMode(next);
   }
   function detailFor(student:Student):LookupResult {
-    return {...student,student:{studentId:student.studentId,fullName:student.fullName,classRoom:student.classRoom,advisor:result?.teacher.name ?? ""},demo:result?.demo ?? false,
+    return {...student,student:{studentId:student.studentId,fullName:student.fullName,classRoom:student.classRoom,studyProgram:student.studyProgram,classHistory:student.classHistory,advisor:result?.teacher.name ?? ""},demo:result?.demo ?? false,
       charges:student.charges.map(c=>({...c,academicYear:c.academicYear ?? 2569,semester:c.semester ?? 1,classRoom:c.classRoom ?? student.classRoom,due:c.due ?? null,paid:c.paid ?? null}))};
   }
 
@@ -274,3 +274,4 @@ function latestPayment(student: Student) {
   const date = new Date(`${latest}T00:00:00+07:00`);
   return Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Bangkok" }).format(date) : "—";
 }
+
