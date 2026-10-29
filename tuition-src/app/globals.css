@@ -96,8 +96,12 @@ button, input { font: inherit; }
 @media(prefers-reduced-motion:reduce) { .mode-choice-grid button { transition:none; } }
 
 /* Teacher detail dialog stays within the viewport and retains the roster beneath it. */
-.student-name-button {text-align:left;color:#17488b;font-weight:600;cursor:pointer;text-decoration:underline;text-decoration-color:#bed0eb;text-underline-offset:4px;border-radius:5px;}
-.student-name-button:hover {color:#0e2d58;text-decoration-color:currentColor;}
+.student-name-button {display:inline-flex;align-items:center;gap:10px;min-height:44px;max-width:100%;padding:6px 8px;margin-left:-8px;border:0;border-radius:8px;background:transparent;color:#223b5c;text-align:left;font-weight:500;text-decoration:none;cursor:pointer;transition:background .15s,color .15s;}
+.student-name-button:hover {background:#eaf2fc;color:#123f76;}
+.student-button-label {min-width:0;line-height:1.5;overflow-wrap:anywhere;}
+.student-button-arrow {flex-shrink:0;color:#a2b1c5;width:13px;height:13px;}
+.student-name-button:hover .student-button-arrow,.student-name-button:focus-visible .student-button-arrow {color:#315d94;}
+@media(prefers-reduced-motion:reduce){.student-name-button{transition:none;}}
 .student-name-button:focus-visible,.student-detail-close:focus-visible {outline:3px solid #60a5fa;outline-offset:4px;}
 .student-detail-dialog {margin:auto;width:min(48rem,calc(100vw - 2rem));max-width:none;max-height:90dvh;padding:0;border:1px solid #dbe6f5;border-radius:24px;background:#f5f8fc;color:#23324b;box-shadow:0 24px 90px #142d5840;overflow:auto;}
 .student-detail-dialog::backdrop {background:rgb(14 32 58 / .5);backdrop-filter:blur(5px);}

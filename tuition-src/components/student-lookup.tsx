@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {teacherDisplayName} from '@/lib/display-name';
 import PasswordInput from "@/components/password-input";
 
 type Charge = {
@@ -74,7 +75,7 @@ export default function StudentLookup({ onResultChange, initialResult, onBack, e
             <h3 className="text-xl font-bold text-blue-950">{result.student.fullName}</h3>
             <p className="text-base text-slate-600">รหัสนักเรียน {result.student.studentId} · ชั้นปัจจุบัน {result.student.classRoom}</p>
             <p className="text-base text-slate-600">กลุ่มวิชา: <span className="font-semibold text-blue-950">{result.student.studyProgram || "ปกติ"}</span></p>
-            <p className="text-base text-slate-600">ครูที่ปรึกษา: {result.student.advisor || "ไม่ระบุ"}</p>
+            <p className="text-base text-slate-600">ครูที่ปรึกษา: {teacherDisplayName(result.student.advisor)}</p>
             <details className="rounded-xl border border-blue-100 bg-blue-50/40 p-4"><summary className="cursor-pointer font-medium text-blue-950">ห้องเรียนแต่ละภาคเรียน</summary>
               {result.student.classHistory?.length ? <ul className="mt-3 space-y-2 text-sm">{[...result.student.classHistory].sort((a,b)=>b.academicYear-a.academicYear || b.semester-a.semester).map(term=><li key={`${term.academicYear}-${term.semester}`} className="flex justify-between gap-3"><span>ภาคเรียนที่ {term.semester}/{term.academicYear}</span><span className="font-semibold text-blue-950">{term.classRoom}</span></li>)}</ul> : <p className="mt-3 text-sm text-slate-500">ยังไม่มีประวัติห้องเรียนที่ยืนยันตามภาคเรียน</p>}
             </details>
