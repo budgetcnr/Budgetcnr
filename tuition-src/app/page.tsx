@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState, useRef } from "react";
 import { BadgeCheck, LogOut, Menu, ShieldCheck, Users, WalletCards, GraduationCap, Presentation } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import StudentLookup, { type LookupResult } from "@/components/student-lookup";
+import StudentDetailsDialog from '@/components/student-details-dialog';
 import PasswordInput from "@/components/password-input";
 import { Progress } from "@/components/ui/progress";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
@@ -29,6 +30,7 @@ const money = new Intl.NumberFormat("th-TH", {
 
 export default function Home() {
   const [mode,setMode] = useState<"student"|"teacher"|null>(null);
+  const detailTrigger=useRef<HTMLButtonElement|null>(null);
   const [selected,setSelected] = useState<Student|null>(null);
   const [teacherId, setTeacherId] = useState("");
   const [password, setPassword] = useState("");
@@ -185,8 +187,6 @@ export default function Home() {
           </div>
           {!studentOpen && <p className="portal-footer">กลุ่มบริหารงบประมาณ · โรงเรียนชิโนรสวิทยาลัย</p>}
         </div>
-      ) : selected ? (
-        <section className="mx-auto max-w-3xl px-4 py-8"><StudentLookup key={selected.studentId} initialResult={detailFor(selected)} onBack={()=>setSelected(null)} /></section>
       ) : (
         <section className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -220,15 +220,16 @@ export default function Home() {
               <div className="hidden overflow-x-auto md:block">
                 <Table>
                   <TableHeader><TableRow className="bg-slate-50"><TableHead className="pl-6">เลขที่</TableHead><TableHead>ชื่อ-นามสกุล</TableHead><TableHead className="text-right">ยอดคงค้าง</TableHead><TableHead className="pr-6 text-right">สถานะ</TableHead></TableRow></TableHeader>
-                  <TableBody>{filtered.map((student) => <StudentRow key={student.studentId} student={student} onOpen={()=>setSelected(student)} />)}</TableBody>
+                  <TableBody>{filtered.map((student) => <StudentRow key={student.studentId} student={student} onOpen={trigger=>{detailTrigger.current=trigger;setSelected(student);}} />)}</TableBody>
                 </Table>
               </div>
-              <div className="divide-y divide-slate-100 md:hidden">{filtered.map((student) => <StudentCard key={student.studentId} student={student} onOpen={()=>setSelected(student)} />)}</div>
+              <div className="divide-y divide-slate-100 md:hidden">{filtered.map((student) => <StudentCard key={student.studentId} student={student} onOpen={trigger=>{detailTrigger.current=trigger;setSelected(student);}} />)}</div>
               {filtered.length === 0 && <div className="px-6 py-12 text-center text-sm text-slate-500">ไม่พบรายชื่อนักเรียนที่ค้นหา</div>}
             </CardContent>
           </Card>
         </section>
       )}
+      {result && selected && <StudentDetailsDialog detail={detailFor(selected)} returnFocus={detailTrigger.current} onClose={()=>setSelected(null)}/>}
     </main>
   );
 }
@@ -254,17 +255,17 @@ function Status({ amount, available=true }: { amount: number; available?:boolean
   if(!available) return <span className="text-sm text-slate-500">ยังไม่มีข้อมูล</span>;
   return amount > 0
     ? <span className="inline-flex rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold text-red-700">ค้างชำระ</span>
-    : <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">ชำระครบ</span>;
+    : <span className="inline-flex rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700">ชำระแล้ว</span>;
 }
 
-function StudentRow({ student, onOpen }: { student: Student; onOpen:()=>void }) {
+function StudentRow({ student, onOpen }: { student: Student; onOpen:(trigger:HTMLButtonElement)=>void }) {
   const amount = totalFor(student);
-  return <TableRow><TableCell className="pl-6 font-medium text-blue-950">{student.rollNumber ?? "—"}</TableCell><TableCell>{student.fullName}</TableCell><TableCell className={`text-right font-semibold ${amount > 0 ? "text-red-700" : "text-emerald-700"}`}>{student.chargesAvailable===false ? "—" : money.format(amount)}</TableCell><TableCell className="pr-6 text-right"><Status amount={amount} available={student.chargesAvailable!==false} /></TableCell></TableRow>;
+  return <TableRow><TableCell className="pl-6 font-medium text-blue-950">{student.rollNumber ?? "—"}</TableCell><TableCell><button type="button" className="student-name-button" aria-haspopup="dialog" onClick={event=>onOpen(event.currentTarget)}>{student.fullName}</button></TableCell><TableCell className={`text-right font-semibold ${amount > 0 ? "text-red-700" : "text-emerald-700"}`}>{student.chargesAvailable===false ? "—" : money.format(amount)}</TableCell><TableCell className="pr-6 text-right"><Status amount={amount} available={student.chargesAvailable!==false} /></TableCell></TableRow>;
 }
 
-function StudentCard({ student, onOpen }: { student: Student; onOpen:()=>void }) {
+function StudentCard({ student, onOpen }: { student: Student; onOpen:(trigger:HTMLButtonElement)=>void }) {
   const amount = totalFor(student);
-  return <article className="p-5"><div className="flex items-start justify-between gap-4"><div><p>{student.fullName}</p><p className="mt-1 text-sm text-slate-500">เลขที่ {student.rollNumber ?? "—"}</p></div><Status amount={amount} available={student.chargesAvailable!==false} /></div><div className="mt-4 flex flex-wrap items-end justify-between gap-4 rounded-xl bg-slate-50 p-4"><button type="button" className="student-detail-link" onClick={onOpen}>ดูรายละเอียดรายภาคเรียน</button><p className={`text-lg font-bold ${amount > 0 ? "text-red-700" : "text-emerald-700"}`}>{student.chargesAvailable===false ? "—" : money.format(amount)}</p></div></article>;
+  return <article className="p-5"><div className="flex items-start justify-between gap-4"><div><button type="button" className="student-name-button" aria-haspopup="dialog" onClick={event=>onOpen(event.currentTarget)}>{student.fullName}</button><p className="mt-1 text-sm text-slate-500">เลขที่ {student.rollNumber ?? "—"}</p></div><Status amount={amount} available={student.chargesAvailable!==false} /></div><div className="mt-4 flex flex-wrap items-end justify-between gap-4 rounded-xl bg-slate-50 p-4"><button type="button" className="student-detail-link" onClick={event=>onOpen(event.currentTarget)}>ดูรายละเอียดรายภาคเรียน</button><p className={`text-lg font-bold ${amount > 0 ? "text-red-700" : "text-emerald-700"}`}>{student.chargesAvailable===false ? "—" : money.format(amount)}</p></div></article>;
 }
 
 function latestPayment(student: Student) {
@@ -274,4 +275,5 @@ function latestPayment(student: Student) {
   const date = new Date(`${latest}T00:00:00+07:00`);
   return Number.isFinite(date.getTime()) ? new Intl.DateTimeFormat("th-TH", { day: "numeric", month: "short", year: "numeric", timeZone: "Asia/Bangkok" }).format(date) : "—";
 }
+
 

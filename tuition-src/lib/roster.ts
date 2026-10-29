@@ -1,3 +1,4 @@
+import {loadClassHistories} from '@/lib/class-history';
 import { env } from "cloudflare:workers";
 import { getRawDb } from "@/db";
 type RosterRow = { study_program: string | null; current_room: string | null; term1_room:string|null; class_history:string|null; student_id: string; roll_number: number | null; full_name: string; class_room: string; advisor: string; status: string; credential_hash: string | null };
@@ -8,6 +9,8 @@ export async function findRosterStudent(studentId: string, nationalId: string) {
   const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${studentId}:${nationalId}`));
   const hash = Array.from(new Uint8Array(digest), value => value.toString(16).padStart(2, "0")).join("");
   if (!row?.credential_hash || row.credential_hash !== hash) return null;
-  return { studentId: row.student_id, rollNumber: row.roll_number, fullName: row.full_name, classRoom: row.current_room || row.class_room, classHistory: JSON.parse(row.class_history || '[]'), advisor: row.advisor, studyProgram: row.study_program, status: row.status };
+  const histories=await loadClassHistories([studentId],new Map([[studentId,JSON.parse(row.class_history || '[]')]]));
+  return { studentId: row.student_id, rollNumber: row.roll_number, fullName: row.full_name, classRoom: row.class_room, classHistory: histories.get(studentId) ?? [], advisor: row.advisor, studyProgram: row.study_program, status: row.status };
 }
+
 

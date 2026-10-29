@@ -94,3 +94,14 @@ button, input { font: inherit; }
 .mode-choice-grid svg { width:38px; height:38px; }
 @media(max-width:480px) { .mode-choice-grid { gap:14px; } .mode-choice-grid button { min-height:156px; padding:24px 12px; font-size:16px; gap:16px; } .mode-choice-grid svg { width:32px; height:32px; } }
 @media(prefers-reduced-motion:reduce) { .mode-choice-grid button { transition:none; } }
+
+/* Teacher detail dialog stays within the viewport and retains the roster beneath it. */
+.student-name-button {text-align:left;color:#17488b;font-weight:600;cursor:pointer;text-decoration:underline;text-decoration-color:#bed0eb;text-underline-offset:4px;border-radius:5px;}
+.student-name-button:hover {color:#0e2d58;text-decoration-color:currentColor;}
+.student-name-button:focus-visible,.student-detail-close:focus-visible {outline:3px solid #60a5fa;outline-offset:4px;}
+.student-detail-dialog {margin:auto;width:min(48rem,calc(100vw - 2rem));max-width:none;max-height:90dvh;padding:0;border:1px solid #dbe6f5;border-radius:24px;background:#f5f8fc;color:#23324b;box-shadow:0 24px 90px #142d5840;overflow:auto;}
+.student-detail-dialog::backdrop {background:rgb(14 32 58 / .5);backdrop-filter:blur(5px);}
+.student-detail-dialog-header {position:sticky;top:0;z-index:2;display:flex;justify-content:space-between;align-items:center;gap:16px;background:#fffffff2;backdrop-filter:blur(12px);padding:18px 24px;border-bottom:1px solid #e2e8f0;}
+.student-detail-dialog-body {padding:24px;}
+.student-detail-close {display:grid;place-items:center;flex-shrink:0;width:40px;height:40px;border-radius:50%;background:#edf3fb;color:#1e3a5f;cursor:pointer;}
+@media(max-width:640px){.student-detail-dialog{width:calc(100vw - 1rem);max-height:94dvh;border-radius:20px;}.student-detail-dialog-body{padding:12px;}.student-detail-dialog-header{padding:14px 16px;}}

@@ -1,0 +1,32 @@
+name: Separate term classroom history
+on:
+  push:
+    branches: [main]
+    paths:
+      - cloudflare/migrations/20261029-classroom-history.sql
+      - scripts/migrate-classroom-history.mjs
+      - .github/workflows/migrate-classroom-history.yml
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Import student study programs]
+    types: [completed]
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: cnr-tuition-database
+  cancel-in-progress: false
+jobs:
+  migrate:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Separate historical classrooms without changing current rooms
+        run: node scripts/migrate-classroom-history.mjs
+        env:
+          CLOUDFLARE_D1_API_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}

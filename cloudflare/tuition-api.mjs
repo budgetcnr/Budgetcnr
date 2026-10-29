@@ -1,12 +1,32 @@
-// cloudflare-port/tuition-src/app/api/check/route.ts
-import { env as env3 } from "cloudflare:workers";
-
 // cloudflare-port/tuition-src/db/index.ts
 import { env } from "cloudflare:workers";
 function getRawDb() {
   if (!env.DB) throw new Error("Database unavailable");
   return env.DB;
 }
+
+// cloudflare-port/tuition-src/lib/class-history.ts
+async function loadClassHistories(studentIds, legacy = /* @__PURE__ */ new Map()) {
+  const histories = /* @__PURE__ */ new Map();
+  try {
+    for (let offset = 0; offset < studentIds.length; offset += 90) {
+      const ids = studentIds.slice(offset, offset + 90);
+      const rows = (await getRawDb().prepare(`SELECT student_id,academic_year,semester,class_room FROM student_classrooms WHERE student_id IN (${ids.map(() => "?").join(",")}) ORDER BY academic_year DESC,semester DESC`).bind(...ids).all()).results;
+      for (const row of rows) {
+        const list = histories.get(row.student_id) ?? [];
+        list.push({ academicYear: row.academic_year, semester: row.semester, classRoom: row.class_room });
+        histories.set(row.student_id, list);
+      }
+    }
+  } catch (error) {
+    if (!String(error).includes("no such table: student_classrooms")) throw error;
+    return legacy;
+  }
+  return histories;
+}
+
+// cloudflare-port/tuition-src/app/api/check/route.ts
+import { env as env3 } from "cloudflare:workers";
 
 // cloudflare-port/tuition-src/lib/teacher-auth.ts
 import { env as env2 } from "cloudflare:workers";
@@ -143,8 +163,9 @@ async function POST(request) {
       const roster = (await db.prepare(`SELECT student_id,full_name,class_room,roll_number,(SELECT study_program FROM student_programs p WHERE p.student_id=student_roster.student_id) AS study_program,(SELECT term1_room FROM student_programs p WHERE p.student_id=student_roster.student_id) AS term1_room,(SELECT class_history FROM student_programs p WHERE p.student_id=student_roster.student_id) AS class_history FROM student_roster
         WHERE class_room IN (SELECT class_room FROM teacher_advisory_rooms WHERE teacher_id=?) ORDER BY class_room,roll_number,student_id`).bind(teacher.id).all()).results;
       const students = [];
+      const histories = await loadClassHistories(roster.map((s) => s.student_id), new Map(roster.map((s) => [s.student_id, JSON.parse(s.class_history || "[]")])));
       const fees = await findRosterFees(roster);
-      for (const s of roster) students.push({ studentId: s.student_id, fullName: s.full_name, classRoom: s.class_room, rollNumber: s.roll_number, studyProgram: s.study_program, classHistory: JSON.parse(s.class_history || "[]"), ...fees.get(s.student_id) });
+      for (const s of roster) students.push({ studentId: s.student_id, fullName: s.full_name, classRoom: s.class_room, rollNumber: s.roll_number, studyProgram: s.study_program, classHistory: histories.get(s.student_id) ?? [], ...fees.get(s.student_id) });
       return Response.json({ teacher: { id: teacherId, name: teacher.full_name, classRoom: rooms.map((r) => r.class_room).join(", ") }, students, demo: false, updatedAt: students.find((s) => s.asOf)?.asOf ?? "\u0E22\u0E31\u0E07\u0E44\u0E21\u0E48\u0E21\u0E35\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25" }, { headers: headers2 });
     } catch {
       return Response.json({ error: "\u0E23\u0E30\u0E1A\u0E1A\u0E02\u0E49\u0E2D\u0E21\u0E39\u0E25\u0E44\u0E21\u0E48\u0E1E\u0E23\u0E49\u0E2D\u0E21\u0E43\u0E0A\u0E49\u0E07\u0E32\u0E19 \u0E01\u0E23\u0E38\u0E13\u0E32\u0E25\u0E2D\u0E07\u0E43\u0E2B\u0E21\u0E48\u0E20\u0E32\u0E22\u0E2B\u0E25\u0E31\u0E07" }, { status: 503, headers: headers2 });
@@ -180,7 +201,8 @@ async function findRosterStudent(studentId, nationalId) {
   const digest = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(`${studentId}:${nationalId}`));
   const hash = Array.from(new Uint8Array(digest), (value) => value.toString(16).padStart(2, "0")).join("");
   if (!row?.credential_hash || row.credential_hash !== hash) return null;
-  return { studentId: row.student_id, rollNumber: row.roll_number, fullName: row.full_name, classRoom: row.current_room || row.class_room, classHistory: JSON.parse(row.class_history || "[]"), advisor: row.advisor, studyProgram: row.study_program, status: row.status };
+  const histories = await loadClassHistories([studentId], /* @__PURE__ */ new Map([[studentId, JSON.parse(row.class_history || "[]")]]));
+  return { studentId: row.student_id, rollNumber: row.roll_number, fullName: row.full_name, classRoom: row.class_room, classHistory: histories.get(studentId) ?? [], advisor: row.advisor, studyProgram: row.study_program, status: row.status };
 }
 
 // cloudflare-port/tuition-src/app/api/student-check/route.ts
