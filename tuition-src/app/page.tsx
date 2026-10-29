@@ -189,29 +189,29 @@ export default function Home() {
           {!studentOpen && <p className="portal-footer">กลุ่มบริหารงบประมาณ · โรงเรียนชิโนรสวิทยาลัย</p>}
         </div>
       ) : (
-        <section className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <section className="teacher-dashboard mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
+          <div className="teacher-heading flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-blue-950">สวัสดี {teacherDisplayName(result.teacher.name)}</h1>
               <p className="mt-2 text-sm text-slate-500">ข้อมูลล่าสุด {result.updatedAt}</p>
             </div>
-            <div className="flex items-center gap-5"><p className="text-3xl font-semibold text-blue-950">{result.teacher.classRoom}</p><Button variant="outline" onClick={signOut} className="w-fit gap-2 border-blue-200 bg-white"><LogOut className="h-4 w-4" /> ออกจากระบบ</Button></div>
+            <div className="teacher-actions flex items-center gap-5"><p className="text-3xl font-semibold text-blue-950">{result.teacher.classRoom}</p><Button variant="outline" onClick={signOut} className="w-fit gap-2 border-blue-200 bg-white"><LogOut className="h-4 w-4" /> ออกจากระบบ</Button></div>
           </div>
 
           {result.demo && <p className="mt-4 text-sm text-amber-800">ข้อมูลทดลอง</p>}
           {result.students.some(s=>s.chargesAvailable===false) && <p className="mt-4 text-sm text-amber-800">ยอดรวมเฉพาะรายการที่มีข้อมูล ไม่รวมผู้ที่ยังไม่มีข้อมูลค่าเทอม</p>}
 
-          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          <div className="teacher-summary mt-6 grid gap-4 sm:grid-cols-2">
             <Summary icon={WalletCards} label="นักเรียนที่มียอดค้าง" value={`${summary.overdue} คน`} tone="amber" />
             <Summary icon={BadgeCheck} label="ยอดค้างรวม" value={money.format(summary.amount)} tone="red" />
           </div>
-          <Card className="dashboard-glass mt-5"><CardContent className="p-5 sm:p-6">
+          <Card className="teacher-progress dashboard-glass mt-5"><CardContent className="p-5 sm:p-6">
             <div className="mb-4 flex justify-between gap-3"><h2 className="font-semibold text-blue-950">สัดส่วนนักเรียนที่ชำระครบ</h2><p>{Math.round(paidPercent)}%</p></div>
             <Progress value={paidPercent} aria-label="สัดส่วนจำนวนนักเรียนที่ชำระครบ" className="h-3 bg-amber-100"/>
             <p className="mt-4 text-sm">ชำระครบ {paidCount} คน จากทั้งหมด {summary.students} คน · ค้างชำระ {summary.overdue} คน</p>
           </CardContent></Card>
 
-          <Card className="dashboard-glass mt-6 overflow-hidden">
+          <Card className="teacher-roster dashboard-glass mt-6 overflow-hidden">
             <CardHeader className="gap-4 border-b border-slate-100 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <CardTitle className="text-xl text-blue-950">รายชื่อนักเรียน</CardTitle><p className="mt-2 text-sm text-slate-500">แตะชื่อเพื่อดูรายละเอียด</p>
@@ -266,7 +266,7 @@ function StudentRow({ student, onOpen }: { student: Student; onOpen:(trigger:HTM
 
 function StudentCard({ student, onOpen }: { student: Student; onOpen:(trigger:HTMLButtonElement)=>void }) {
   const amount = totalFor(student);
-  return <article className="p-5"><div className="flex items-start justify-between gap-4"><div><button type="button" className="student-name-button" aria-haspopup="dialog" onClick={event=>onOpen(event.currentTarget)}><span className="student-button-label">{student.fullName}</span><ChevronRight className="student-button-arrow h-4 w-4" aria-hidden="true"/></button><p className="mt-1 text-sm text-slate-500">เลขที่ {student.rollNumber ?? "—"}</p></div><Status amount={amount} available={student.chargesAvailable!==false} /></div><div className="mt-4 flex flex-wrap items-end justify-between gap-4 rounded-xl bg-slate-50 p-4"><span className="text-xs text-slate-500">ยอดค้างรวม</span><p className={`text-lg font-bold ${amount > 0 ? "text-red-700" : "text-emerald-700"}`}>{student.chargesAvailable===false ? "—" : money.format(amount)}</p></div></article>;
+  return <article className="student-mobile-row"><span className="student-roll">{student.rollNumber ?? "—"}</span><button type="button" className="student-name-button" aria-haspopup="dialog" onClick={event=>onOpen(event.currentTarget)}><span className="student-button-label">{student.fullName}</span><ChevronRight className="student-button-arrow" aria-hidden="true"/></button><div className="student-mobile-status"><Status amount={amount} available={student.chargesAvailable!==false} />{student.chargesAvailable!==false && amount>0 && <p className="text-xs font-semibold text-red-700">{money.format(amount)}</p>}</div></article>;
 }
 
 function latestPayment(student: Student) {
