@@ -11,6 +11,8 @@ async function query(sql, params = []) {
   assert(response.ok && data.success && data.result.every(r => r.success), 'D1 request failed');
   return data.result.flatMap(r => r.results || []);
 }
+const candidates = await query("SELECT t.id,t.full_name,t.personnel_id,t.login_enabled,GROUP_CONCAT(a.class_room) AS advisory_rooms FROM teacher_roster t LEFT JOIN teacher_advisory_rooms a ON a.teacher_id=t.id WHERE t.full_name LIKE ? OR t.personnel_id=? GROUP BY t.id ORDER BY t.id", ['%จิร%', '691573']);
+console.log('Account identity diagnostic (no credentials): ' + JSON.stringify(candidates));
 const rows = await query('SELECT id,full_name,login_enabled,credential_hash FROM teacher_roster WHERE personnel_id=?', ['691573']);
 assert(rows.length === 1 && rows[0].full_name.includes('จิรภาส'), 'Account identity mismatch; no changes made');
 const teacher = rows[0];
