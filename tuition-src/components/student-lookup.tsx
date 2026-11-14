@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {teacherDisplayName} from '@/lib/display-name';
 import PasswordInput from "@/components/password-input";
+import PaymentLink from "@/components/payment-link";
 
 type Charge = {
   academicYear: number; semester: number; classRoom: string;
@@ -47,7 +48,7 @@ export default function StudentLookup({ onResultChange, initialResult, onBack, e
   }
 
   return (
-    <section aria-label={embedded ? "รายละเอียดค่าเทอมนักเรียน" : undefined} aria-labelledby={embedded ? undefined : "student-title"} className={result ? `student-result min-w-0 ${embedded ? "pb-4" : "pb-36 sm:pb-40"}` : "student-portal min-w-0"}>
+    <section aria-label={embedded ? "รายละเอียดค่าบำรุงการศึกษานักเรียน" : undefined} aria-labelledby={embedded ? undefined : "student-title"} className={result ? `student-result min-w-0 ${embedded ? "pb-4" : "pb-36 sm:pb-40"}` : "student-portal min-w-0"}>
       {!result ? (
         <Card className="login-card student-card">
           <CardHeader className="login-card-head">
@@ -67,7 +68,7 @@ export default function StudentLookup({ onResultChange, initialResult, onBack, e
         </Card>
       ) : (
         <div className="space-y-5">
-          {!embedded && <div className="flex flex-wrap items-center justify-between gap-3"><h2 id="student-title" className="text-2xl font-bold text-blue-950">ข้อมูลค่าเทอมรายบุคคล</h2>
+          {!embedded && <div className="flex flex-wrap items-center justify-between gap-3"><h2 id="student-title" className="text-2xl font-bold text-blue-950">ข้อมูลค่าบำรุงการศึกษารายบุคคล</h2>
             <Button variant="outline" onClick={() => { if(onBack) { onBack(); return; } setResult(null); onResultChange?.(false); setError(""); }}>{onBack ? "กลับรายชื่อนักเรียน" : "ออกจากระบบ"}</Button></div>}
           {result.demo && <p className="text-sm text-amber-800">ข้อมูลทดลอง</p>}
           {result.asOf && <p className="text-sm text-slate-600">อ้างอิงรายงานยอดค้าง ณ {new Intl.DateTimeFormat("th-TH", { day:"numeric", month:"long", year:"numeric", timeZone:"Asia/Bangkok" }).format(new Date(`${result.asOf}T00:00:00+07:00`))}</p>}
@@ -77,31 +78,25 @@ export default function StudentLookup({ onResultChange, initialResult, onBack, e
             <p className="text-base text-slate-600">กลุ่มวิชา: <span className="font-semibold text-blue-950">{result.student.studyProgram || "ปกติ"}</span></p>
             <p className="text-base text-slate-600">ครูที่ปรึกษา: {teacherDisplayName(result.student.advisor)}</p>
             </div>
-            <div className={`student-total rounded-2xl p-5 ${total > 0 || result.chargesAvailable === false ? "bg-blue-950 text-white" : "bg-emerald-50 text-emerald-900"}`}>
+            <div className="student-payment-summary"><div className={`student-total rounded-2xl p-5 ${total > 0 || result.chargesAvailable === false ? "bg-blue-950 text-white" : "bg-emerald-50 text-emerald-900"}`}>
               <p className="flex items-center gap-2 text-base"><WalletCards className="h-5 w-5" />ยอดค้างรวมทุกภาคเรียน</p>
               <p className="mt-2 text-3xl font-bold tabular-nums">{result.chargesAvailable === false ? "—" : money(total)} {result.chargesAvailable !== false && <span className="text-lg font-normal">บาท</span>}</p>
-              {result.chargesAvailable === false ? <p className="mt-2 text-base">ยังไม่มีข้อมูลค่าเทอมที่ยืนยันได้</p> : total === 0 && <p className="mt-2 text-base">{result.reportOnly ? "ชำระแล้วตามรายงาน" : result.charges.length ? "ชำระแล้วทุกภาคเรียนที่แสดง" : "ไม่พบรายการเรียกเก็บ"}</p>}
-            </div>
-            <details className="rounded-xl border border-blue-100 bg-blue-50/40 p-4"><summary className="cursor-pointer font-medium text-blue-950">ห้องเรียนแต่ละภาคเรียน</summary>
-              {result.student.classHistory?.length ? <ul className="mt-3 space-y-2 text-sm">{[...result.student.classHistory].sort((a,b)=>b.academicYear-a.academicYear || b.semester-a.semester).map(term=><li key={`${term.academicYear}-${term.semester}`} className="flex justify-between gap-3"><span>ภาคเรียนที่ {term.semester}/{term.academicYear}</span><span className="font-semibold text-blue-950">{term.classRoom}</span></li>)}</ul> : <p className="mt-3 text-sm text-slate-500">ยังไม่มีประวัติห้องเรียนที่ยืนยันตามภาคเรียน</p>}
-            </details>
+              {result.chargesAvailable === false ? <p className="mt-2 text-base">ยังไม่มีข้อมูลค่าบำรุงการศึกษาที่ยืนยันได้</p> : total === 0 && <p className="mt-2 text-base">{result.reportOnly ? "ชำระแล้วตามรายงาน" : result.charges.length ? "ชำระแล้วทุกภาคเรียนที่แสดง" : "ไม่พบรายการเรียกเก็บ"}</p>}
+            </div><PaymentLink compact /></div>
+
           </CardContent></Card>
           <h3 className="text-lg font-semibold text-blue-950">{result.reportOnly ? "ยอดค้างรายภาคเรียน" : "ประวัติรายภาคเรียน"}</h3>
           {groups.map(({ key, rows }) => {
-            const outstanding = rows.reduce((sum, row) => sum + row.outstanding, 0);
-            const status = outstanding === 0 ? "ชำระแล้ว" : "ยอดค้างชำระ";
             const year = rows[0].academicYear;
             const shortYear = String(year < 2400 ? year + 543 : year).slice(-2);
             return <Card key={key} className="dashboard-glass"><CardContent className="p-5 sm:p-6">
-              <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex flex-wrap items-center gap-3">{rows[0].classRoom && <span className="class-chip">{historicalClass(result.student.classRoom, year, rows[0].semester, result.student.classHistory)}</span>}<h4 className="text-lg font-semibold text-blue-950">ภาคเรียนที่ {rows[0].semester}/{shortYear}</h4></div>
-                <span className={`rounded-full px-3 py-1 text-sm font-medium ${outstanding === 0 ? "bg-emerald-50 text-emerald-800" : "bg-red-50 text-red-700"}`}>{status}</span></div>
+              <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex flex-wrap items-center gap-3">{rows[0].classRoom && <span className="class-chip">{historicalClass(result.student.classRoom, year, rows[0].semester, result.student.classHistory).split("/")[0].replace(" (ไม่ยืนยันห้อง)", "")}</span>}<h4 className="text-lg font-semibold text-blue-950">ภาคเรียนที่ {rows[0].semester}/{shortYear}</h4></div>
+              </div>
               <div className="mt-5 space-y-5">{rows.map((row, index) => <div key={index}>
-                <p className="font-medium">{row.item}</p>
-                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-50 px-4 py-3">
-                  <p className="text-sm text-slate-600">{row.outstanding>0 ? 'ยอดค้างชำระ' : 'สถานะการชำระ'}</p>
+                <p className="font-medium">{row.item.replace(/ยอดค้างค่าเทอม|ยอดค้างค่าบำรุงการศึกษา|ค่าเทอม/g, "ค่าบำรุงการศึกษา")}</p>
+                <div className="mt-3 flex items-center justify-end rounded-xl bg-slate-50 px-4 py-3">
                   <p className={`text-lg font-semibold tabular-nums ${row.outstanding>0 ? 'text-red-700' : 'text-emerald-700'}`}>{row.outstanding>0 ? `${money(row.outstanding)} บาท` : 'ชำระแล้ว'}</p>
                 </div>
-                <p className="mt-3 text-sm text-slate-500">อัปเดตข้อมูล: {row.updatedAt || "ไม่ระบุ"}</p>
               </div>)}</div>
             </CardContent></Card>;
           })}
@@ -109,7 +104,7 @@ export default function StudentLookup({ onResultChange, initialResult, onBack, e
           {result.reportOnly && <p className="text-sm leading-6 text-slate-500">ภาคเรียนที่ไม่มีรายการค้างในรายงาน หมายถึงชำระครบแล้ว ณ วันที่รายงาน ไม่ใช่ประวัติยอดเงินหรือวันที่ชำระ</p>}
           <p className="text-sm leading-6 text-slate-500">หากยอดไม่ตรงกับหลักฐานการชำระ กรุณาติดต่อเจ้าหน้าที่การเงิน</p>
           {!embedded && <div className="fixed inset-x-0 bottom-0 z-50 border-t border-blue-100 bg-white/95 px-4 pt-4 shadow-[0_-8px_30px_rgba(15,44,86,0.12)] backdrop-blur-lg" style={{ paddingBottom: "max(1rem, env(safe-area-inset-bottom))" }}>
-            <div className="mx-auto flex max-w-3xl items-center justify-between gap-3"><div><p className="text-sm text-slate-600">ยอดค้างรวมทุกภาคเรียน</p>{result.chargesAvailable === false ? <p className="text-sm text-slate-500">ยังไม่มีข้อมูลค่าเทอมที่ยืนยันได้</p> : total === 0 && <p className="text-sm text-emerald-700">{result.reportOnly ? "ชำระแล้วตามรายงาน" : "ไม่พบยอดค้างในรายการที่แสดง"}</p>}</div>
+            <div className="mx-auto flex max-w-3xl items-center justify-between gap-3"><div><p className="text-sm text-slate-600">ยอดค้างรวมทุกภาคเรียน</p>{result.chargesAvailable === false ? <p className="text-sm text-slate-500">ยังไม่มีข้อมูลค่าบำรุงการศึกษาที่ยืนยันได้</p> : total === 0 && <p className="text-sm text-emerald-700">{result.reportOnly ? "ชำระแล้วตามรายงาน" : "ไม่พบยอดค้างในรายการที่แสดง"}</p>}</div>
               <p className={`text-2xl font-bold tabular-nums ${total > 0 || result.chargesAvailable === false ? "text-blue-950" : "text-emerald-700"}`}>{result.chargesAvailable === false ? "—" : money(total)} {result.chargesAvailable !== false && <span className="text-base font-normal">บาท</span>}</p></div>
           </div>}
         </div>

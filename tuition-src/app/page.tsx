@@ -11,6 +11,7 @@ import StudentLookup, { type LookupResult } from "@/components/student-lookup";
 import StudentDetailsDialog from '@/components/student-details-dialog';
 import {teacherDisplayName} from '@/lib/display-name';
 import PasswordInput from "@/components/password-input";
+import PaymentLink from "@/components/payment-link";
 import { Progress } from "@/components/ui/progress";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
@@ -153,7 +154,7 @@ export default function Home() {
         <div className="login-shell">
           {!studentOpen && <div className="login-heading">
             <p className="portal-kicker">CNR · TUITION</p>
-            <h1>ตรวจสอบค่าเทอม</h1>
+            <h1>ตรวจสอบค่าบำรุงการศึกษา</h1>
           </div>}
           {!studentOpen && <nav aria-label="เลือกโหมดผู้ใช้งาน" className={mode ? "mode-selector" : "mode-selector mode-choice-grid"}>
             <button type="button" aria-pressed={mode==="student"} onClick={()=>switchMode("student")}><GraduationCap aria-hidden="true"/>นักเรียน / ผู้ปกครอง</button>
@@ -186,6 +187,7 @@ export default function Home() {
             </CardContent>
           </Card>}
           </div>
+          {!studentOpen && <PaymentLink />}
           {!studentOpen && <p className="portal-footer">กลุ่มบริหารงบประมาณ · โรงเรียนชิโนรสวิทยาลัย</p>}
         </div>
       ) : (
