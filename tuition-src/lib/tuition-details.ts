@@ -1,36 +1,59 @@
-const documentIds = {
-  upperIep: "1uQ2eEDlt4aVbsusnLNCH2mMOFEfKAvtj",
-  lowerRegular: "1P8PfZiJQu1b9QmpGaPhvGgc6qWHswl9U",
-  japanese: "1R-ADB0pKYpckRpSdZ-A7S6Nf8D4eAm2q",
-  upperRegular: "1CCRcFCwgsgi4glw2WA7ukKWtQA0UnvpH",
-  lowerEsmp: "1Q6-XfE5YxzEkO2nCdTrCeOP6RvkKloXU",
-  french: "12FKpOMAEtghASTCAzp_OnkCR1uNXweCX",
-  lowerIep: "1C6ehBFGoMF2QiJbeZv4rM9x7BA8y3qCs",
-  upperEsmp: "1MEYG_rttECXLgRnr2KmR4KwXBfCimRGf",
-  chinese: "1ey21LoD6LROk_cYx472LNW-9EfbTxWYf",
-};
+type FeeItem = readonly [label: string, amount: number];
+type TuitionDetails = { items: FeeItem[]; pdfFilename: string };
 
-const programDocuments = new Map([
-  ["ปกติ", [documentIds.lowerRegular, documentIds.upperRegular]],
-  ["ESMP", [documentIds.lowerEsmp, documentIds.upperEsmp]],
-  ["IEP", [documentIds.lowerIep, documentIds.upperIep]],
+const specialist: FeeItem = ["ค่าจ้างครูที่มีความเชี่ยวชาญในสาขาเฉพาะ", 600];
+const foreignTeacher: FeeItem = ["ค่าจ้างครูชาวต่างประเทศ", 500];
+const airConditioning: FeeItem = ["ค่าสาธารณูปโภคสำหรับห้องเรียนปรับอากาศ", 500];
+const computing: FeeItem = ["ค่าสอนคอมพิวเตอร์กรณีจัดคอมพิวเตอร์เกินมาตรฐานที่รัฐจัดให้", 500];
+const staff: FeeItem = ["ค่าจ้างบุคลากรที่ปฏิบัติงานในสถานศึกษา", 800];
+const languageClassroom: FeeItem = ["ห้องเรียนพิเศษด้านภาษา", 8750];
+const chineseTeacher: FeeItem = ["ค่าจ้างครูสอนภาษาจีน", 300];
+
+const regular = [specialist, foreignTeacher, airConditioning, computing, staff];
+
+function esmp(classroomFee: number): FeeItem[] {
+  return [
+    ["ห้องเรียนพิเศษวิทยาศาสตร์-คณิตศาสตร์ และอื่น ๆ", classroomFee],
+    foreignTeacher, specialist, airConditioning, computing, staff,
+  ];
+}
+
+const lowerIep: FeeItem[] = [
+  languageClassroom, specialist, chineseTeacher, airConditioning, staff, computing,
+  ["เงินสนับสนุนกิจกรรมโครงการพิเศษภาคภาษาอังกฤษ", 2550],
+];
+const upperIep: FeeItem[] = [
+  languageClassroom, specialist, airConditioning, staff, computing,
+  ["เงินสนับสนุนกิจกรรมโครงการพิเศษภาคภาษาอังกฤษ", 2850],
+];
+
+const lowerPrograms = new Map<string, TuitionDetails>([
+  ["ปกติ", { items: [specialist, foreignTeacher, chineseTeacher, airConditioning, computing, staff], pdfFilename: "lower-regular.pdf" }],
+  ["ESMP", { items: esmp(10000), pdfFilename: "lower-esmp.pdf" }],
+  ["IEP", { items: lowerIep, pdfFilename: "lower-iep.pdf" }],
+]);
+const upperPrograms = new Map<string, TuitionDetails>([
+  ["ปกติ", { items: regular, pdfFilename: "upper-regular.pdf" }],
+  ["ESMP", { items: esmp(7500), pdfFilename: "upper-esmp.pdf" }],
+  ["IEP", { items: upperIep, pdfFilename: "upper-iep.pdf" }],
+  ["ญี่ปุ่น", { items: regular, pdfFilename: "upper-japanese.pdf" }],
+  ["จีน", {
+    items: [specialist, foreignTeacher, ["ค่าจ้างครูสอนภาษาจีน", 1200], airConditioning, computing, staff],
+    pdfFilename: "upper-chinese.pdf",
+  }],
+  ["ฝรั่งเศส", {
+    items: [specialist, foreignTeacher, ["ค่าจ้างครูสอนภาษาฝรั่งเศส", 300], airConditioning, computing, staff],
+    pdfFilename: "upper-french.pdf",
+  }],
 ]);
 
-const upperLanguageDocuments = new Map([
-  ["จีน", documentIds.chinese],
-  ["ญี่ปุ่น", documentIds.japanese],
-  ["ฝรั่งเศส", documentIds.french],
-]);
-
-export function getTuitionDetailsUrl(classRoom: string, studyProgram?: string) {
+export function getTuitionDetails(classRoom: string, studyProgram?: string) {
   const gradeMatch = classRoom.trim().match(/^(?:ม\.\s*)?([1-6])(?:\s*\/\s*\d+)?$/);
   if (!gradeMatch || !studyProgram) return undefined;
 
-  const isUpperSecondary = Number(gradeMatch[1]) >= 4;
+  const grade = Number(gradeMatch[1]);
   const program = studyProgram.trim().toUpperCase();
-  const documents = programDocuments.get(program);
-  const id = documents?.[isUpperSecondary ? 1 : 0]
-    ?? (isUpperSecondary ? upperLanguageDocuments.get(program) : undefined);
-
-  return id ? `https://drive.google.com/file/d/${id}/view` : undefined;
+  // The lower-secondary IEP notice covers only ม.1 and ม.2.
+  if (grade === 3 && program === "IEP") return undefined;
+  return (grade >= 4 ? upperPrograms : lowerPrograms).get(program);
 }

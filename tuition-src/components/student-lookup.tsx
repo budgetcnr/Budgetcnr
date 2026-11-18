@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { ExternalLink, GraduationCap, WalletCards, LogOut } from "lucide-react";
+import { ChevronDown, Download, GraduationCap, WalletCards, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import {teacherDisplayName} from '@/lib/display-name';
 import PasswordInput from "@/components/password-input";
 import PaymentLink from "@/components/payment-link";
-import { getTuitionDetailsUrl } from "@/lib/tuition-details";
+import { getTuitionDetails } from "@/lib/tuition-details";
 
 type Charge = {
   academicYear: number; semester: number; classRoom: string;
@@ -28,7 +28,7 @@ export default function StudentLookup({ onResultChange, initialResult, onBack, e
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const total = result?.reportedTotal ?? result?.charges.reduce((sum, row) => sum + row.outstanding, 0) ?? 0;
-  const detailsUrl = result && getTuitionDetailsUrl(result.student.classRoom, result.student.studyProgram);
+  const feeDetails = result && getTuitionDetails(result.student.classRoom, result.student.studyProgram);
   const groups = result ? Array.from(new Set(result.charges.map(row => `${row.semester}/${row.academicYear}`)))
     .map(key => ({ key, rows: result.charges.filter(row => `${row.semester}/${row.academicYear}` === key) }))
     .sort((a, b) => b.rows[0].academicYear - a.rows[0].academicYear || b.rows[0].semester - a.rows[0].semester) : [];
@@ -92,7 +92,7 @@ export default function StudentLookup({ onResultChange, initialResult, onBack, e
             const year = rows[0].academicYear;
             const buddhistYear = year < 2400 ? year + 543 : year;
             const shortYear = String(buddhistYear).slice(-2);
-            const termDetailsUrl = buddhistYear === 2569 && rows[0].semester === 2 ? detailsUrl : undefined;
+            const termDetails = buddhistYear === 2569 && rows[0].semester === 2 ? feeDetails : undefined;
             return <Card key={key} className="dashboard-glass"><CardContent className="p-5 sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex flex-wrap items-center gap-3">{rows[0].classRoom && <span className="class-chip">{historicalClass(result.student.classRoom, year, rows[0].semester, result.student.classHistory).split("/")[0].replace(" (ไม่ยืนยันห้อง)", "")}</span>}<h4 className="text-lg font-semibold text-blue-950">ภาคเรียนที่ {rows[0].semester}/{shortYear}</h4></div>
               </div>
@@ -102,11 +102,37 @@ export default function StudentLookup({ onResultChange, initialResult, onBack, e
                   <p className={`text-lg font-semibold tabular-nums ${row.outstanding>0 ? 'text-red-700' : 'text-emerald-700'}`}>{row.outstanding>0 ? `${money(row.outstanding)} บาท` : 'ชำระแล้ว'}</p>
                 </div>
               </div>)}</div>
-              {termDetailsUrl && (
-                <a className="payment-card-button payment-card-details mt-4" href={termDetailsUrl} target="_blank" rel="noopener noreferrer">
-                  ดูรายละเอียด <ExternalLink aria-hidden="true" />
-                  <span className="sr-only"> (เปิด PDF ในแท็บใหม่)</span>
-                </a>
+              {termDetails && (
+                <details className="tuition-fee-details mt-4">
+                  <summary className="payment-card-button payment-card-details">
+                    <span className="fee-details-show">ดูรายละเอียด</span>
+                    <span className="fee-details-hide">ซ่อนรายละเอียด</span>
+                    <ChevronDown aria-hidden="true" />
+                  </summary>
+                  <div className="mt-4 rounded-xl bg-slate-50 px-4 py-3">
+                    <h5 className="font-semibold text-blue-950">รายการค่าบำรุงการศึกษาตามประกาศโรงเรียน</h5>
+                    <dl className="mt-2 divide-y divide-slate-200 text-sm">
+                      {termDetails.items.map(([label, amount]) => (
+                        <div key={label} className="flex justify-between gap-3 py-2">
+                          <dt>{label}</dt>
+                          <dd className="shrink-0 text-right tabular-nums">{money(amount)} บาท</dd>
+                        </div>
+                      ))}
+                      <div className="flex justify-between gap-3 py-2 font-semibold text-blue-950">
+                        <dt>รวมตามประกาศ</dt>
+                        <dd className="shrink-0 text-right tabular-nums">{money(termDetails.items.reduce((sum, [, amount]) => sum + amount, 0))} บาท</dd>
+                      </div>
+                    </dl>
+                    <a
+                      className="payment-card-button mt-3"
+                      href={`/tuition/notices/2569-2/${termDetails.pdfFilename}`}
+                      download={`ประกาศค่าบำรุงการศึกษา-2-2569-${termDetails.pdfFilename}`}
+                    >
+                      <Download aria-hidden="true" />
+                      ดาวน์โหลด PDF
+                    </a>
+                  </div>
+                </details>
               )}
             </CardContent></Card>;
           })}

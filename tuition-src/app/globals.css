@@ -185,3 +185,9 @@ button, input { font: inherit; }
 
 .payment-card-details{background:transparent;color:#082b5c;box-shadow:inset 0 0 0 1px #adc2da}
 .payment-card-details:hover{background:#e8f0fa}
+
+.tuition-fee-details summary{cursor:pointer;list-style:none}
+.tuition-fee-details summary::-webkit-details-marker{display:none}
+.tuition-fee-details .fee-details-hide,.tuition-fee-details[open] .fee-details-show{display:none}
+.tuition-fee-details[open] .fee-details-hide{display:inline}
+.tuition-fee-details[open] summary svg{transform:rotate(180deg)}
