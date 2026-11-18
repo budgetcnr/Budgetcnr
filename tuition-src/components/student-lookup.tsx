@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { GraduationCap, WalletCards, LogOut } from "lucide-react";
+import { ExternalLink, GraduationCap, WalletCards, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import {teacherDisplayName} from '@/lib/display-name';
 import PasswordInput from "@/components/password-input";
 import PaymentLink from "@/components/payment-link";
+import { getTuitionDetailsUrl } from "@/lib/tuition-details";
 
 type Charge = {
   academicYear: number; semester: number; classRoom: string;
@@ -27,6 +28,7 @@ export default function StudentLookup({ onResultChange, initialResult, onBack, e
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const total = result?.reportedTotal ?? result?.charges.reduce((sum, row) => sum + row.outstanding, 0) ?? 0;
+  const detailsUrl = result && getTuitionDetailsUrl(result.student.classRoom, result.student.studyProgram);
   const groups = result ? Array.from(new Set(result.charges.map(row => `${row.semester}/${row.academicYear}`)))
     .map(key => ({ key, rows: result.charges.filter(row => `${row.semester}/${row.academicYear}` === key) }))
     .sort((a, b) => b.rows[0].academicYear - a.rows[0].academicYear || b.rows[0].semester - a.rows[0].semester) : [];
@@ -88,7 +90,9 @@ export default function StudentLookup({ onResultChange, initialResult, onBack, e
           <h3 className="text-lg font-semibold text-blue-950">{result.reportOnly ? "ยอดค้างรายภาคเรียน" : "ประวัติรายภาคเรียน"}</h3>
           {groups.map(({ key, rows }) => {
             const year = rows[0].academicYear;
-            const shortYear = String(year < 2400 ? year + 543 : year).slice(-2);
+            const buddhistYear = year < 2400 ? year + 543 : year;
+            const shortYear = String(buddhistYear).slice(-2);
+            const termDetailsUrl = buddhistYear === 2569 && rows[0].semester === 2 ? detailsUrl : undefined;
             return <Card key={key} className="dashboard-glass"><CardContent className="p-5 sm:p-6">
               <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex flex-wrap items-center gap-3">{rows[0].classRoom && <span className="class-chip">{historicalClass(result.student.classRoom, year, rows[0].semester, result.student.classHistory).split("/")[0].replace(" (ไม่ยืนยันห้อง)", "")}</span>}<h4 className="text-lg font-semibold text-blue-950">ภาคเรียนที่ {rows[0].semester}/{shortYear}</h4></div>
               </div>
@@ -98,6 +102,12 @@ export default function StudentLookup({ onResultChange, initialResult, onBack, e
                   <p className={`text-lg font-semibold tabular-nums ${row.outstanding>0 ? 'text-red-700' : 'text-emerald-700'}`}>{row.outstanding>0 ? `${money(row.outstanding)} บาท` : 'ชำระแล้ว'}</p>
                 </div>
               </div>)}</div>
+              {termDetailsUrl && (
+                <a className="payment-card-button payment-card-details mt-4" href={termDetailsUrl} target="_blank" rel="noopener noreferrer">
+                  ดูรายละเอียด <ExternalLink aria-hidden="true" />
+                  <span className="sr-only"> (เปิด PDF ในแท็บใหม่)</span>
+                </a>
+              )}
             </CardContent></Card>;
           })}
           {groups.length === 0 && <p className="rounded-xl bg-white p-5 text-slate-600">{result.detailsAvailable === false ? result.chargesAvailable === false ? "ยอดรวมและรายละเอียดรายภาคเรียนรอตรวจสอบ" : "รายละเอียดรายภาคเรียนรอตรวจสอบ ใช้ยอดรวมตามรายงาน" : result.chargesAvailable === false ? "รออัปเดตข้อมูลที่ยืนยันได้จากงานการเงิน" : result.reportOnly ? "ชำระครบตามรายงานของห้องนี้" : "ไม่พบรายการเรียกเก็บในระบบ"}</p>}
