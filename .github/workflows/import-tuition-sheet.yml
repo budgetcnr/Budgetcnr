@@ -1,11 +1,7 @@
 name: Import authoritative tuition sheet
 on:
-  push:
-    branches: [main]
-    paths:
-      - .github/workflows/import-tuition-sheet.yml
-      - scripts/import-tuition-sheet.mjs
-      - cloudflare/tuition-sheet-update.enc.json
+  # Historical one-time import only. Never replay the October snapshot on push.
+  # Use sync-tuition-sheet.yml to preview/import the current private workbook.
   workflow_dispatch:
 permissions:
   contents: read

@@ -1,0 +1,43 @@
+name: Preview or sync latest tuition sheet
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Export public transfer key, preview transfer, or apply verified balances
+        type: choice
+        options: [public-key, preview, apply]
+        default: public-key
+permissions:
+  contents: read
+concurrency:
+  group: cnr-tuition-database
+  cancel-in-progress: false
+jobs:
+  sync:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test snapshot import and encrypted transfer
+        run: node --test tests/sync-tuition-sheet.test.mjs tests/tuition-transfer.test.mjs
+      - name: Export public transfer key
+        if: inputs.operation == 'public-key'
+        env:
+          ROSTER_CREDENTIAL_KEY: ${{ secrets.ROSTER_CREDENTIAL_KEY }}
+        run: node scripts/tuition-transfer.mjs public-key
+      - name: Preview transfer against active D1 balances
+        if: inputs.operation != 'public-key'
+        env:
+          CLOUDFLARE_D1_API_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          ROSTER_CREDENTIAL_KEY: ${{ secrets.ROSTER_CREDENTIAL_KEY }}
+        run: node scripts/sync-tuition-sheet.mjs cloudflare/tuition-sheet-live.enc.json --encrypted
+      - name: Save and verify balances
+        if: inputs.operation == 'apply'
+        env:
+          CLOUDFLARE_D1_API_TOKEN: ${{ secrets.CLOUDFLARE_D1_API_TOKEN }}
+          ROSTER_CREDENTIAL_KEY: ${{ secrets.ROSTER_CREDENTIAL_KEY }}
+        run: node scripts/sync-tuition-sheet.mjs cloudflare/tuition-sheet-live.enc.json --encrypted --apply
